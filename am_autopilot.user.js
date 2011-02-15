@@ -5,6 +5,10 @@
 // Please see the full GNU General Public License at <http://www.gnu.org/licenses>
 //--------------------------------------------------------------------------------------------------------------------------
 
+// This meta is to allow the script to read the commented lines in between
+// the commented lines are for Greasmonkey to read, but we also need it for 
+// the Check4Update function to get the version number of this script to
+// compare it with the latest version on the server.
 var fap_meta = <><![CDATA[
 // ==UserScript==
 // @name	Airline Manager Auto Pilot
@@ -17,15 +21,21 @@ var fap_meta = <><![CDATA[
 // ==/UserScript==
 ]]></>;
 
-var fDelay=4000, fmin=0, fsec, ftimeref, fSL=0, fML=0, FBSession;
+var fDelay=4000;	// A delay value after opening or doing an action (to give the browser sometime to load tha page), this time is in milliseconds, each 1000 milliseconds = 1 second
 
-//var ftestcounter=0;
+var fmin=0;	// Global variable for the minutes of the counter
+var fsec;	// Global variable for the seconds of the counter
+var ftimeref;	// A refrence to the timer object so we can call it again to stop it
+var fSL=0;	// Global variable used for the number of rounds the script should wait for while loading a page before it stops
+var fML=0;	// Global variable that keep count of how many times the we ran the script after the AM page was loaded. (this is to solve a bug in AM) so after a number of rounds it will just refresh and reload the AM page.
+var FBSession;	// Stores the Facebook settion identifier for the user which AM uses when calling its own links to know the FB user.
 
-function fRand(value){
+
+function fRand(value){	// Generates a random number between 1 and value (we use it mainly to add a random seconds while calling the AM funstions
     return Math.floor(Math.random() * (value+1));
 }
 
-function replaceText(sId, sText){
+function replaceText(sId, sText){	// A the name says, it sets the text of an HTML element if you have its ID
     var f_el;
     if (document.getElementById && (f_el = document.getElementById(sId))){
 	while (f_el.hasChildNodes()){
@@ -85,11 +95,11 @@ function replaceText(sId, sText){
 //    }
 //}
 
-function fFuelASettings(){
+function fFuelASettings(){	// Store the fuel setting under Firefox
     GM_setValue('fFAmount',parseInt(document.getElementById('fFAmount').value));
 }
 
-function fCSettings(){
+function fCSettings(){	// Store the catering settings under Firefox
     GM_setValue('fCAmount',parseInt(document.getElementById('fCAmount').value));
     GM_setValue('lCatering',parseInt(document.getElementById('lCatering').value));
 
@@ -100,7 +110,7 @@ function fCSettings(){
     }
 }
 
-function fSettings(){
+function fSettings(){	// Store the script settings under Firefox
     GM_setValue('fTime',parseInt(document.getElementById('f_timefreq').value));
     GM_setValue('fRTime',parseInt(document.getElementById('f_randtime').value));
     GM_setValue('fNote',document.getElementById('fNote').value);
@@ -135,7 +145,7 @@ function fSettings(){
     }
 }
 
-function Display(min,sec){
+function Display(min,sec){	// Format the time as min:sec (mm:ss)
     var disp;
     if(min<=9){
 	disp='0'+min+':';
@@ -499,7 +509,7 @@ function f_BuyCatering(){
 
 function fBuyAirplane(){
 
-    fSL = fSL + 1;
+    fSL = fSL + 1;		// don't use the fSL variable, create something new for this function
 
     GM_xmlhttpRequest({
 	method: 'POST',
@@ -657,7 +667,7 @@ function fPoller(){
 
 	GetFBSession();
 
-//        fSL = 0;
+//        fSL = 0;	// fSL should not be used here, create a new global variable to use for buying airplanes
 //	fBuyAirplane();
 //        fSellAirplane();
 //        return;
