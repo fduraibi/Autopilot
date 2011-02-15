@@ -10,7 +10,8 @@ var fap_meta = <><![CDATA[
 // @name	Airline Manager Auto Pilot
 // @namespace	http://fadvisor.net/blog/2010/03/auto-pilot/
 // @author	Fahad Alduraibi
-// @version	1.2.4
+// @updaters	Olla
+// @version	1.2.5
 // @include	http://apps.facebook.com/airline_manager/*
 // @include	http://airlinemanager.activewebs.dk/am/*
 // ==/UserScript==
