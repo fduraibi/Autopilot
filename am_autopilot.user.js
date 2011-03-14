@@ -14,10 +14,10 @@ var fap_meta = <><![CDATA[
 // @name	Airline Manager Auto Pilot
 // @namespace	http://fadvisor.net/blog/2010/03/auto-pilot/
 // @author	Fahad Alduraibi
-// @updaters	Olla
-// @version	1.2.5
+// @version	1.2.6a
 // @include	http://apps.facebook.com/airline_manager/*
 // @include	http://airlinemanager.activewebs.dk/am/*
+// @updaters	Fahad Alduraibi, Olla
 // ==/UserScript==
 ]]></>;
 
@@ -29,7 +29,6 @@ var ftimeref;	// A refrence to the timer object so we can call it again to stop 
 var fSL=0;	// Global variable used for the number of rounds the script should wait for while loading a page before it stops
 var fML=0;	// Global variable that keep count of how many times the we ran the script after the AM page was loaded. (this is to solve a bug in AM) so after a number of rounds it will just refresh and reload the AM page.
 var FBSession;	// Stores the Facebook settion identifier for the user which AM uses when calling its own links to know the FB user.
-
 
 function fRand(value){	// Generates a random number between 1 and value (we use it mainly to add a random seconds while calling the AM funstions
     return Math.floor(Math.random() * (value+1));
@@ -45,55 +44,53 @@ function replaceText(sId, sText){	// A the name says, it sets the text of an HTM
     }
 }
 
+function fCheck4Update(){
+    var fDate = new Date();
+    var fTime = Math.floor(fDate.getTime() / 259200000);	// Convert to 3 days (3 days = 259200000 milliseconds)
+    var fOldTime = GM_getValue('fOldTime', '-1');
 
-// -- I removed the update support from my server, so this function will not work anymore. Sorry for that :(
-//function fCheck4Update(){
-//    var fDate = new Date();
-//    var fTime = Math.floor(fDate.getTime() / 259200000);	// Convert to 3 days (3 days = 259200000 milliseconds)
-//    var fOldTime = GM_getValue('fOldTime', '-1');
-//
-//    //    if (fOldTime === '-1'){	   // The first time assume the user installed the latest version
-//    //	fOldTime = fTime;
-//    //	GM_setValue('fOldTime',fOldTime);
-//    //    }
-//    GM_log('Update -> ' + Math.floor(fDate.getTime() / 259200000));
-//    if ( (fTime - fOldTime) > 0){	// Perform the real check every 3 days
-//
-//	var fCV = fap_meta.split(/[\n]+/).filter(/@version/).toString().replace(/^[\s\r\n]+|[\s\r\n]+$/g, '').split(/[\s]+/); //Get the line with word @version
-//	fCV = fCV[2]; // get the third element
-//
-//	if (GM_getValue('fOldVer') === fCV){
-//	    GM_log('You did not update yet!!!!!!! x-(');
-//	    replaceText('f_status','A new update is avalible');
-//	}else {
-//
-//	    GM_xmlhttpRequest({
-//		method: 'GET',
-//		url: 'http://fadvisor.net/blog/download/am_latest_version',
-//		headers: {
-//		    'User-Agent': 'Mozilla/5.0 (compatible) Greasemonkey-Autopilot',
-//		    'Accept': 'text/xml'
-//		},
-//		onload: function(response) {
-//		    if (response.status === 200){
-//			var fSV = response.responseText.toString().replace(/^[\s\r\n]+|[\s\r\n]+$/g, '');	// Strip whitespaces and line-feeds
-//			GM_log('Response =' + response.responseText);
-//			if (fCV === fSV){
-//			    GM_setValue('fOldTime',fTime);
-//			    GM_log('You are in good shape :)');
-//			} else{
-//			    GM_log('You need to update :(');
-//			    GM_setValue('fOldVer',fCV);
-//			    replaceText('f_status','A new update is avalible');
-//			}
-//		    } else{
-//			GM_log('Unable to fetch AP update page');
-//		    }
-//		}
-//	    });
-//	}
-//    }
-//}
+    //    if (fOldTime === '-1'){	   // The first time assume the user installed the latest version
+    //	fOldTime = fTime;
+    //	GM_setValue('fOldTime',fOldTime);
+    //    }
+    GM_log('Update -> ' + Math.floor(fDate.getTime() / 259200000));
+    if ( (fTime - fOldTime) > 0){	// Perform the real check every 3 days
+
+	var fCV = fap_meta.split(/[\n]+/).filter(/@version/).toString().replace(/^[\s\r\n]+|[\s\r\n]+$/g, '').split(/[\s]+/); //Get the line with word @version
+	fCV = fCV[2]; // get the third element
+
+	if (GM_getValue('fOldVer') === fCV){
+	    GM_log('You did not update yet!!!!!!! x-(');
+	    replaceText('f_status','A new update is avalible');
+	}else {
+
+	    GM_xmlhttpRequest({
+		method: 'GET',
+		url: 'http://fadvisor.net/blog/download/am_latest_version',
+		headers: {
+		    'User-Agent': 'Mozilla/5.0 (compatible) Greasemonkey-Autopilot',
+		    'Accept': 'text/xml'
+		},
+		onload: function(response) {
+		    if (response.status === 200){
+			var fSV = response.responseText.toString().replace(/^[\s\r\n]+|[\s\r\n]+$/g, '');	// Strip whitespaces and line-feeds
+			GM_log('Response =' + response.responseText);
+			if (fCV === fSV){
+			    GM_setValue('fOldTime',fTime);
+			    GM_log('You are in good shape :)');
+			} else{
+			    GM_log('You need to update :(');
+			    GM_setValue('fOldVer',fCV);
+			    replaceText('f_status','A new update is avalible');
+			}
+		    } else{
+			GM_log('Unable to fetch AP update page');
+		    }
+		}
+	    });
+	}
+    }
+}
 
 function fFuelASettings(){	// Store the fuel setting under Firefox
     GM_setValue('fFAmount',parseInt(document.getElementById('fFAmount').value));
@@ -788,28 +785,66 @@ function addControls(){
 	var fFAmount=GM_getValue('fFAmount',1000000);
 	var fNote=GM_getValue('fNote','Use this area to save notes');
 
-	var f_html='<table border="0" style="border-bottom-style : dotted; border-bottom-width : 2px;"><tbody><tr><td><input type="button" id="Autopilot" value="Autopilot"></td>'+
-	'<td style="border-left-style : dotted; border-left-width : 2px;"><input type="text" name="f_timefreq" value=' + fTime +' size="1px" maxlength="2" id="f_timefreq" style="text-align : center;">min +</td>'+
-	'<td>Random<input type="text" name="f_randtime" value=' + fRTime +' size="1px" maxlength="2" id="f_randtime" style="text-align : center;" alt="Random Time"></td></tr>'+
-	'<tr><td id="f_timer" bgcolor="#ff0000" style="text-align : center;">Stopped</td>'+
-	'<td style="border-left-style : dotted; border-left-width : 2px;"><input type="checkbox" name="fRepair" '+ fRepair +' id="fRepair" style="margin-top : 0px;">Repair</td>'+
-	'<td><input type="checkbox" name="fCheck" '+ fCheck +' id="fCheck" style="margin-top : 0px;">C-Check</td></tr></tbody></table>'+
-	'<table border="0" style="width: 100%;"><tbody><tr><td><a href="javascript:;//Open Note" onmousedown=\'if(document.getElementById("dNote").style.display == "none"){ document.getElementById(\"dNote\").style.display = "table-row"; }else{ document.getElementById(\"dNote\").style.display = "none"; }\'>[+]</a>&nbsp;'+
-	'<a href="javascript:;//Open Catering" onmousedown=\'if(document.getElementById("dCatering").style.display == "none"){ document.getElementById(\"dCatering\").style.display = "table-row"; }else{ document.getElementById(\"dCatering\").style.display = "none"; }\'>[C]</a>&nbsp;'+
-        '<a href="javascript:;//Open Fuel" onmousedown=\'if(document.getElementById("dFuel").style.display == "none"){ document.getElementById(\"dFuel\").style.display = "table-row"; }else{ document.getElementById(\"dFuel\").style.display = "none"; }\'>[F]</a>&nbsp;'+
-	'<a href="http://fadvisor.net/blog/2010/03/auto-pilot/">@</a></td><td  id="f_status" style="color: red;"></td></tr>'+
+	var f_html = <><![CDATA[
+<table border="0" style="border-bottom-style : dotted; border-bottom-width : 2px;"><tbody><tr>
+<td><input title="Start or Stop the script" type="button" id="Autopilot" value="Autopilot"></td>
+<td style="border-left-style : dotted; border-left-width : 2px;"><input title="Time to wait between each run" type="text" name="f_timefreq" value=fTimeReplace size="1px" maxlength="2" id="f_timefreq" style="text-align : center;">min +</td>
+<td>Random<input title="A random value (between 0 & what you set) added to the wait time." type="text" name="f_randtime" value=fRTimeReplace size="1px" maxlength="2" id="f_randtime" style="text-align : center;" alt="Random Time"></td></tr>
+<tr><td title="Status of the script (or count down to when it will run next)" id="f_timer" bgcolor="#ff0000" style="text-align : center;">Stopped</td>
+<td style="border-left-style : dotted; border-left-width : 2px;"><input title="Enable repairing aircrafts before flying them" type="checkbox" name="fRepair" fRepairReplace id="fRepair" style="margin-top : 0px;">Repair</td>
+<td><input title="Enable doing c-check on aircrafts before flying them" type="checkbox" name="fCheck" fCheckReplace id="fCheck" style="margin-top : 0px;">C-Check</td>
+</tr></tbody></table>
+<table border="0" style="width: 100%;"><tbody><tr>
+<td><a title="Open the Note box" href="javascript:;//Open Note" onmousedown='if(document.getElementById("dNote").style.display == "none"){ document.getElementById("dNote").style.display = "table-row"; }else{ document.getElementById("dNote").style.display = "none"; }'>[+]</a>&nbsp;
+<a title="Open the Catering Settings" href="javascript:;//Open Catering" onmousedown='if(document.getElementById("dCatering").style.display == "none"){ document.getElementById("dCatering").style.display = "table-row"; }else{ document.getElementById("dCatering").style.display = "none"; }'>[C]</a>&nbsp;
+<a title="Open the Fuel Settings" href="javascript:;//Open Fuel" onmousedown='if(document.getElementById("dFuel").style.display == "none"){ document.getElementById("dFuel").style.display = "table-row"; }else{ document.getElementById("dFuel").style.display = "none"; }'>[F]</a>&nbsp;
+<a title="Visit the script website" href="http://fadvisor.net/blog/2010/03/auto-pilot/">@</a></td><td  id="f_status" style="color: red;"></td>
+</tr>
+<tr id="dCatering" style="display:none">
+<td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;"><input title="Enable buying catering before flying the aircrafts (will only buy if you don't have any)" type="checkbox" name="fCatering" fCateringReplace id="fCatering" style="margin-top : 0px;">Catering<br>
+<select title="Select the type of catering you like to buy" id="lCatering"><option value="7" lCatering7Selected>7- Sky+</option><option value="6" lCatering6Selected>6- Sky Catering</option><option value="5" lCatering5Selected>5- Sky Burgers</option>
+<option value="4" lCatering4Selected>4- Fast Food</option><option value="3" lCatering3Selected>3- Sky Fish</option><option value="2" lCatering2Selected>2- Cloud Chefs</option><option value="1" lCatering1Selected>1- AM Catering</option></select>
+ Amount<input title="Set the amount of catering to buy (you should follow the min & max values set by the game)" type="text" name="fCAmount" value=fCAmountReplace size="4px" maxlength="5" id="fCAmount" style="text-align : center;"></td>
+</tr>
+<tr id="dFuel" style="display:none">
+<td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;"><input title="Enable buying fuel" type="checkbox" name="fFuel" fFuelReplace id="fFuel" style="margin-top : 0px;">Fuel
+  |  If price is or below <input title="The maximum price that you would like to pay for fuel, if the actual price is higher it will not buy anything (and if the price is lower it will buy with that price)" type="text" name="fFCost" value=fFCostReplace size="4px" maxlength="4" id="fFCost" style="text-align : center;"><br>
+fill tank<input title="Check this box if you want the script to fill the tank to the maximum when the price is what you want" type="checkbox" name="fFuelFill" fFuelFillReplace id="fFuelFill" style="margin-top : 0px;">
+ or fill up to <input title="The desired amount of fuel that you want to have in your tank" type="text" name="fFAmount" value=fFAmountReplace size="9px" maxlength="9" id="fFAmount" style="text-align : center;"></td>
+</tr>
+<tr id="dNote" style="display:none">
+<td colspan="2"><textarea rows="4" style="width: 97%;" id="fNote">fNoteReplace</textarea></td>
+</tr></tbody></table>
+	]]></>;
 
-        '<tr id="dCatering" style="display:none"><td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;"><input type="checkbox" name="fCatering" '+ fCatering +' id="fCatering" style="margin-top : 0px;">Catering<br>'+
-	'<select id="lCatering"><option value="7"' +(lCatering===7?' selected="yes"':'')+ '>7- Sky+</option><option value="6"' +(lCatering===6?' selected="yes"':'')+ '>6- Sky Catering</option><option value="5"' +(lCatering===5?' selected="yes"':'')+ '>5- Sky Burgers</option>'+
-	'<option value="4"' +(lCatering===4?' selected="yes"':'')+ '>4- Fast Food</option><option value="3"' +(lCatering===3?' selected="yes"':'')+ '>3- Sky Fish</option><option value="2"' +(lCatering===2?' selected="yes"':'')+ '>2- Cloud Chefs</option><option value="1"' +(lCatering===1?' selected="yes"':'')+ '>1- AM Catering</option></select>'+
-	' Amount<input type="text" name="fCAmount" value=' + fCAmount +' size="4px" maxlength="5" id="fCAmount" style="text-align : center;"></td></tr>'+
+	f_html = f_html.toString().replace('fTimeReplace', fTime);
+	f_html = f_html.toString().replace('fRTimeReplace', fRTime);
+	f_html = f_html.toString().replace('fRepairReplace', fRepair);
+	f_html = f_html.toString().replace('fCheckReplace', fCheck);
+	f_html = f_html.toString().replace('fCateringReplace', fCatering);
+	f_html = f_html.toString().replace('fCAmountReplace', fCAmount);
+	f_html = f_html.toString().replace('fFuelReplace', fFuel);
+	f_html = f_html.toString().replace('fFCostReplace', fFCost);
+	f_html = f_html.toString().replace('fFuelFillReplace', fFuelFill);
+	f_html = f_html.toString().replace('fFAmountReplace', fFAmount);
+	f_html = f_html.toString().replace('fNoteReplace', fNote);
+	
+	if (lCatering===1 )
+	    f_html = f_html.toString().replace('lCatering1Selected', 'selected="yes"');
+	else if (lCatering===2 )
+	    f_html = f_html.toString().replace('lCatering2Selected', 'selected="yes"');
+	else if (lCatering===3 )
+	    f_html = f_html.toString().replace('lCatering3Selected', 'selected="yes"');
+	else if (lCatering===4 )
+	    f_html = f_html.toString().replace('lCatering4Selected', 'selected="yes"');
+	else if (lCatering===5 )
+	    f_html = f_html.toString().replace('lCatering5Selected', 'selected="yes"');
+	else if (lCatering===6 )
+	    f_html = f_html.toString().replace('lCatering6Selected', 'selected="yes"');
+	else if (lCatering===7 )
+	    f_html = f_html.toString().replace('lCatering7Selected', 'selected="yes"');
 
-        '<tr id="dFuel" style="display:none"><td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;"><input type="checkbox" name="fFuel" '+ fFuel +' id="fFuel" style="margin-top : 0px;">Fuel'+
-        '  |  If price is or below <input type="text" name="fFCost" value=' + fFCost +' size="4px" maxlength="4" id="fFCost" style="text-align : center;"><br>'+
-	'fill tank<input type="checkbox" name="fFuelFill" '+ fFuelFill +' id="fFuelFill" style="margin-top : 0px;">'+
-        ' or fill up to <input type="text" name="fFAmount" value=' + fFAmount +' size="9px" maxlength="9" id="fFAmount" style="text-align : center;"></td></tr>'+
-
-	'<tr id="dNote" style="display:none"><td colspan="2"><textarea rows="4" style="width: 97%;" id="fNote">' + fNote +'</textarea></td></tr></tbody></table>'
+	f_html = f_html.toString().replace(/lCatering.?Selected/g, '');
 
 	var fdiv = document.createElement("div");
 	fdiv.setAttribute("style", "position : absolute; top: 100px; left: 5px; z-index : 10; background: rgb(255, 255, 255); border-bottom-style : dotted; border-bottom-width : 2px; border-left-style : dotted; border-left-width : 2px; border-right-style : dotted; border-right-width : 2px; border-top-style : dotted; border-top-width : 2px;");
@@ -836,20 +871,10 @@ function addControls(){
             document.getElementById('fFAmount').disabled = true;
         }
 
-	//fCheck4Update();
+	fCheck4Update();
 	GM_log('FB Controls loaded...l=' + location.href.toString());
 	window.setTimeout(wasIrunning, fDelay);
     }
 }
 window.setTimeout(addControls, fDelay);
 //GM_log('s-load.. ->  l=' + location.href.toString().substr(0, 60));
-
-
-
-
-//if ((location.href.toString().substr(0, 56) === 'http://airlinemanager.activewebs.dk/am/?fb_sig_in_iframe' || location.href.toString().substr(0, 54) === 'http://airlinemanager.activewebs.dk/am/maintenance.php' || location.href.toString().substr(0, 53) === 'http://airlinemanager.activewebs.dk/am/c_perf_all.php') && GM_getValue('fLoadAM') === 1)	// AM frame
-//else if (location.href.toString().substr(0, 41) === 'http://apps.facebook.com/airline_manager/' && fAP === null)    // Facebook frame, check if Controls are not already loaded
-//    http://apps.facebook.com/airline_manager/
-//    http://airlinemanager.activewebs.dk/am/?fb_sig_in_iframe
-//    http://airlinemanager.activewebs.dk/am/c_perf_all.php
-//    http://airlinemanager.activewebs.dk/am/maintenance.php
