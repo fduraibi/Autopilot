@@ -12,7 +12,8 @@
 var fap_meta = <><![CDATA[
 // ==UserScript==
 // @name	Airline Manager Auto Pilot
-// @namespace	http://fadvisor.net/blog/2010/03/auto-pilot/
+// @url	http://fadvisor.net/blog/2010/03/auto-pilot/
+// @namespace	autopilot
 // @author	Fahad Alduraibi
 // @version	1.2.6a
 // @include	http://apps.facebook.com/airline_manager/*
@@ -29,6 +30,7 @@ var ftimeref;	// A refrence to the timer object so we can call it again to stop 
 var fSL=0;	// Global variable used for the number of rounds the script should wait for while loading a page before it stops
 var fML=0;	// Global variable that keep count of how many times the we ran the script after the AM page was loaded. (this is to solve a bug in AM) so after a number of rounds it will just refresh and reload the AM page.
 var FBSession;	// Stores the Facebook settion identifier for the user which AM uses when calling its own links to know the FB user.
+var fFuelTankMax=999999999; // Maximum amount of fuel a normal tank can have (that could change by AM)
 
 function fRand(value){	// Generates a random number between 1 and value (we use it mainly to add a random seconds while calling the AM funstions
     return Math.floor(Math.random() * (value+1));
@@ -61,7 +63,7 @@ function fCheck4Update(){
 
 	if (GM_getValue('fOldVer') === fCV){
 	    GM_log('You did not update yet!!!!!!! x-(');
-	    replaceText('f_status','A new update is avalible');
+	    replaceText('f_status','Get the new update');
 	}else {
 
 	    GM_xmlhttpRequest({
@@ -81,7 +83,7 @@ function fCheck4Update(){
 			} else{
 			    GM_log('You need to update :(');
 			    GM_setValue('fOldVer',fCV);
-			    replaceText('f_status','A new update is avalible');
+			    replaceText('f_status','Get the new update');
 			}
 		    } else{
 			GM_log('Unable to fetch AP update page');
@@ -90,72 +92,6 @@ function fCheck4Update(){
 	    });
 	}
     }
-}
-
-function fFuelASettings(){	// Store the fuel setting under Firefox
-    GM_setValue('fFAmount',parseInt(document.getElementById('fFAmount').value));
-}
-
-function fCSettings(){	// Store the catering settings under Firefox
-    GM_setValue('fCAmount',parseInt(document.getElementById('fCAmount').value));
-    GM_setValue('lCatering',parseInt(document.getElementById('lCatering').value));
-
-    if(document.getElementById('fCatering').checked === true){
-	GM_setValue('fCatering', 'Checked');
-    } else{
-	GM_setValue('fCatering', '');
-    }
-}
-
-function fSettings(){	// Store the script settings under Firefox
-    GM_setValue('fTime',parseInt(document.getElementById('f_timefreq').value));
-    GM_setValue('fRTime',parseInt(document.getElementById('f_randtime').value));
-    GM_setValue('fNote',document.getElementById('fNote').value);
-    GM_setValue('fFCost',parseInt(document.getElementById('fFCost').value));
-
-    if(document.getElementById('fFuelFill').checked === true){
-	GM_setValue('fFuelFill', 'Checked');
-        document.getElementById('fFAmount').value = 999999999;
-        document.getElementById('fFAmount').disabled = true;
-    } else{
-	GM_setValue('fFuelFill', '');
-        document.getElementById('fFAmount').value = GM_getValue('fFAmount',1000000);
-        document.getElementById('fFAmount').disabled = false;
-    }
-
-    if(document.getElementById('fFuel').checked === true){
-	GM_setValue('fFuel', 'Checked');
-    } else{
-	GM_setValue('fFuel', '');
-    }
-
-    if(document.getElementById('fRepair').checked === true){
-	GM_setValue('fRepair', 'Checked');
-    } else{
-	GM_setValue('fRepair', '');
-    }
-
-    if(document.getElementById('fCheck').checked === true){
-	GM_setValue('fCheck', 'Checked');
-    } else{
-	GM_setValue('fCheck', '');
-    }
-}
-
-function Display(min,sec){	// Format the time as min:sec (mm:ss)
-    var disp;
-    if(min<=9){
-	disp='0'+min+':';
-    } else {
-	disp=min+':';
-    }
-
-    if(sec<=9){
-	disp+='0'+sec;
-    } else{
-	disp+=sec;
-    }
-    return(disp);
 }
 
 //function f_Ads(){
@@ -601,7 +537,7 @@ function f_Fuel(){
                             if( Price <= GM_getValue('fFCost')){
                                 var fAmnt
                                 if(GM_getValue('fFuelFill') === 'Checked'){
-                                    fAmnt = 999999999 - Tank;
+                                    fAmnt = fFuelTankMax - Tank;
                                 }else{
                                     fAmnt = GM_getValue('fFAmount',1000000) - Tank;
                                 }
@@ -709,10 +645,26 @@ function fPoller(){
     window.setTimeout(fPoller, 4000);
 }
 
+function Display(min,sec){	// Format the time as min:sec (mm:ss)
+    var disp;
+    if(min<=9){
+	disp='0'+min+':';
+    } else {
+	disp=min+':';
+    }
+
+    if(sec<=9){
+	disp+='0'+sec;
+    } else{
+	disp+=sec;
+    }
+    return(disp);
+}
+
 function ff_Countdown(){
     fsec = fsec - 5;
     if((fmin<=0)&&(fsec<=0)){
-	if ( fML < 20 ){    //Refresh the page every 20 runs (to over come a bug in AM page)
+	if ( fML < 5 ){    //Refresh the page every 5 runs (to over come a bug in AM page)
 	    fmin = document.getElementById('f_timefreq').value - 0;
 	    fmin = fmin - 0 + fRand(document.getElementById('f_randtime').value - 0);  // Add randomly between 0 to x minutes (the zero subtraction  is to make it arithmetic operation)
 	    fsec = fRand(6) * 10;   //Randomize the starting time as well
@@ -761,6 +713,68 @@ function wasIrunning(){
     }
 }
 
+function fFuelASettings(){	// Store the fuel setting under Firefox
+    GM_setValue('fFAmount',parseInt(document.getElementById('fFAmount').value));
+}
+
+function fCSettings(){	// Store the catering settings under Firefox
+    GM_setValue('fCAmount',parseInt(document.getElementById('fCAmount').value));
+    GM_setValue('lCatering',parseInt(document.getElementById('lCatering').value));
+
+    if(document.getElementById('fCatering').checked === true){
+	GM_setValue('fCatering', 'Checked');
+    } else{
+	GM_setValue('fCatering', '');
+    }
+}
+
+function fASettings(){	// Store the advertising settings under Firefox
+    GM_setValue('fACost',parseInt(document.getElementById('fACost').value));
+    GM_setValue('lAds',parseInt(document.getElementById('lAds').value));
+    GM_setValue('lADays',parseInt(document.getElementById('lADays').value));
+
+    if(document.getElementById('fAds').checked === true){
+	GM_setValue('fAds', 'Checked');
+    } else{
+	GM_setValue('fAds', '');
+    }
+}
+
+function fSettings(){	// Store the script settings under Firefox
+    GM_setValue('fTime',parseInt(document.getElementById('f_timefreq').value));
+    GM_setValue('fRTime',parseInt(document.getElementById('f_randtime').value));
+    GM_setValue('fNote',document.getElementById('fNote').value);
+    GM_setValue('fFCost',parseInt(document.getElementById('fFCost').value));
+
+    if(document.getElementById('fFuelFill').checked === true){
+	GM_setValue('fFuelFill', 'Checked');
+        document.getElementById('fFAmount').value = fFuelTankMax;
+        document.getElementById('fFAmount').disabled = true;
+    } else{
+	GM_setValue('fFuelFill', '');
+        document.getElementById('fFAmount').value = GM_getValue('fFAmount',1000000);
+        document.getElementById('fFAmount').disabled = false;
+    }
+
+    if(document.getElementById('fFuel').checked === true){
+	GM_setValue('fFuel', 'Checked');
+    } else{
+	GM_setValue('fFuel', '');
+    }
+
+    if(document.getElementById('fRepair').checked === true){
+	GM_setValue('fRepair', 'Checked');
+    } else{
+	GM_setValue('fRepair', '');
+    }
+
+    if(document.getElementById('fCheck').checked === true){
+	GM_setValue('fCheck', 'Checked');
+    } else{
+	GM_setValue('fCheck', '');
+    }
+}
+
 function addControls(){
     var fFB = document.getElementById('content');
     var fAP = document.getElementById('Autopilot');
@@ -783,21 +797,28 @@ function addControls(){
         var fFuelFill=GM_getValue('fFuelFill','');
 	var fFCost=GM_getValue('fFCost',400);
 	var fFAmount=GM_getValue('fFAmount',1000000);
+	var fAds=GM_getValue('fAds','');
+	var lAds=GM_getValue('lAds',9);
+	var lADays=GM_getValue('lADays',7);
+	var fACost=GM_getValue('fACost',7500);
 	var fNote=GM_getValue('fNote','Use this area to save notes');
 
 	var f_html = <><![CDATA[
+<div style="position: absolute; top: 100px; left: 5px; z-index: 10; background: none repeat scroll 0% 0% rgb(255, 255, 255); border-style: dotted; border-width: 2px;">
 <table border="0" style="border-bottom-style : dotted; border-bottom-width : 2px;"><tbody><tr>
 <td><input title="Start or Stop the script" type="button" id="Autopilot" value="Autopilot"></td>
 <td style="border-left-style : dotted; border-left-width : 2px;"><input title="Time to wait between each run" type="text" name="f_timefreq" value=fTimeReplace size="1px" maxlength="2" id="f_timefreq" style="text-align : center;">min +</td>
 <td>Random<input title="A random value (between 0 & what you set) added to the wait time." type="text" name="f_randtime" value=fRTimeReplace size="1px" maxlength="2" id="f_randtime" style="text-align : center;" alt="Random Time"></td></tr>
 <tr><td title="Status of the script (or count down to when it will run next)" id="f_timer" bgcolor="#ff0000" style="text-align : center;">Stopped</td>
-<td style="border-left-style : dotted; border-left-width : 2px;"><input title="Enable repairing aircrafts before flying them" type="checkbox" name="fRepair" fRepairReplace id="fRepair" style="margin-top : 0px;">Repair</td>
-<td><input title="Enable doing c-check on aircrafts before flying them" type="checkbox" name="fCheck" fCheckReplace id="fCheck" style="margin-top : 0px;">C-Check</td>
+<td style="border-left-style : dotted; border-left-width : 2px;"><input title="Enable doing c-check on aircrafts before flying them" type="checkbox" name="fCheck" fCheckReplace id="fCheck" style="margin-top : 0px;">C-Check</td>
+<td><input title="Enable repairing aircrafts before flying them" type="checkbox" name="fRepair" fRepairReplace id="fRepair" style="margin-top : 0px;">Repair</td>
 </tr></tbody></table>
 <table border="0" style="width: 100%;"><tbody><tr>
 <td><a title="Open the Note box" href="javascript:;//Open Note" onmousedown='if(document.getElementById("dNote").style.display == "none"){ document.getElementById("dNote").style.display = "table-row"; }else{ document.getElementById("dNote").style.display = "none"; }'>[+]</a>&nbsp;
 <a title="Open the Catering Settings" href="javascript:;//Open Catering" onmousedown='if(document.getElementById("dCatering").style.display == "none"){ document.getElementById("dCatering").style.display = "table-row"; }else{ document.getElementById("dCatering").style.display = "none"; }'>[C]</a>&nbsp;
 <a title="Open the Fuel Settings" href="javascript:;//Open Fuel" onmousedown='if(document.getElementById("dFuel").style.display == "none"){ document.getElementById("dFuel").style.display = "table-row"; }else{ document.getElementById("dFuel").style.display = "none"; }'>[F]</a>&nbsp;
+<a title="Open the Advertising Settings" href="javascript:;//Open Ads" onmousedown='if(document.getElementById("dAds").style.display == "none"){ document.getElementById("dAds").style.display = "table-row"; }else{ document.getElementById("dAds").style.display = "none"; }'>[A]</a>&nbsp;
+<a title="Open the Buy & Sell Aircrafts Settings" href="javascript:;//Open Buy&Sell" onmousedown='if(document.getElementById("dBuySell").style.display == "none"){ document.getElementById("dBuySell").style.display = "table-row"; }else{ document.getElementById("dBuySell").style.display = "none"; }'>[$]</a>&nbsp;
 <a title="Visit the script website" href="http://fadvisor.net/blog/2010/03/auto-pilot/">@</a></td><td  id="f_status" style="color: red;"></td>
 </tr>
 <tr id="dCatering" style="display:none">
@@ -808,13 +829,50 @@ function addControls(){
 </tr>
 <tr id="dFuel" style="display:none">
 <td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;"><input title="Enable buying fuel" type="checkbox" name="fFuel" fFuelReplace id="fFuel" style="margin-top : 0px;">Fuel
-  |  If price is or below <input title="The maximum price that you would like to pay for fuel, if the actual price is higher it will not buy anything (and if the price is lower it will buy with that price)" type="text" name="fFCost" value=fFCostReplace size="4px" maxlength="4" id="fFCost" style="text-align : center;"><br>
+  |  If price is or below <input title="The maximum price that you would like to pay for fuel, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price)" type="text" name="fFCost" value=fFCostReplace size="4px" maxlength="4" id="fFCost" style="text-align : center;"><br>
 fill tank<input title="Check this box if you want the script to fill the tank to the maximum when the price is what you want" type="checkbox" name="fFuelFill" fFuelFillReplace id="fFuelFill" style="margin-top : 0px;">
  or fill up to <input title="The desired amount of fuel that you want to have in your tank" type="text" name="fFAmount" value=fFAmountReplace size="9px" maxlength="9" id="fFAmount" style="text-align : center;"></td>
 </tr>
+<tr id="dAds" style="display:none">
+<td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;">
+<input title="Enable buying ads" type="checkbox" name="fAds" fAdsReplace id="fAds" style="margin-top : 0px;">Ads
+  |  If price is or below <input title="The maximum price that you would like to pay for ads, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price)" type="text" name="fACost" value=fACostReplace size="5px" maxlength="5" id="fACost" style="text-align : center;">
+  <a title="See the price prediction at this link" href="http://fadvisor.net/blog/2010/06/airlinemanager-ads-prices/"> @</a>
+  <br>
+<select title="Select the type of advertising you like to buy" id="lAds">
+<option value="0" lAds0Selected>Newspaper advertising</option>
+<option value="1" lAds1Selected>1 tv commercial</option>
+<option value="2" lAds2Selected>Internet: In major search engines</option>
+<option value="3" lAds3Selected>Internet: In major social networks</option>
+<option value="4" lAds4Selected>Bus and Taxi posters</option>
+<option value="5" lAds5Selected>10 tv commercials + newspaper ads</option>
+<option value="6" lAds6Selected>Cross country newspaper advertising</option>
+<option value="7" lAds7Selected>Billboards on major streetsg</option>
+<option value="8" lAds8Selected>Billboards on 1 major airport</option>
+<option value="9" lAds9Selected>Billboards on 20 international airports</option>
+</select><br><br>
+<select id="lADays">
+<option value="1" lADay1Selected>1 Day</option>
+<option value="2" lADay2Selected>2 Days</option>
+<option value="3" lADay3Selected>3 Days</option>
+<option value="4" lADay4Selected>4 Days</option>
+<option value="5" lADay5Selected>5 Days</option>
+<option value="6" lADay6Selected>6 Days</option>
+<option value="7" lADay7Selected>7 Days</option>
+</select>
+</td>
+</tr>
+<tr id="dBuySell" style="display:none">
+<td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;">
+Reserved for Buying and Selling aircrafts
+<br>
+* To be implemented *
+</td>
+</tr>
 <tr id="dNote" style="display:none">
-<td colspan="2"><textarea rows="4" style="width: 97%;" id="fNote">fNoteReplace</textarea></td>
+<td colspan="2" style="border-top-style:dotted; border-top-width:2px;"><textarea rows="4" style="width: 97%;" id="fNote">fNoteReplace</textarea></td>
 </tr></tbody></table>
+</div>
 	]]></>;
 
 	f_html = f_html.toString().replace('fTimeReplace', fTime);
@@ -829,26 +887,17 @@ fill tank<input title="Check this box if you want the script to fill the tank to
 	f_html = f_html.toString().replace('fFAmountReplace', fFAmount);
 	f_html = f_html.toString().replace('fNoteReplace', fNote);
 	
-	if (lCatering===1 )
-	    f_html = f_html.toString().replace('lCatering1Selected', 'selected="yes"');
-	else if (lCatering===2 )
-	    f_html = f_html.toString().replace('lCatering2Selected', 'selected="yes"');
-	else if (lCatering===3 )
-	    f_html = f_html.toString().replace('lCatering3Selected', 'selected="yes"');
-	else if (lCatering===4 )
-	    f_html = f_html.toString().replace('lCatering4Selected', 'selected="yes"');
-	else if (lCatering===5 )
-	    f_html = f_html.toString().replace('lCatering5Selected', 'selected="yes"');
-	else if (lCatering===6 )
-	    f_html = f_html.toString().replace('lCatering6Selected', 'selected="yes"');
-	else if (lCatering===7 )
-	    f_html = f_html.toString().replace('lCatering7Selected', 'selected="yes"');
-
+	f_html = f_html.toString().replace('lCatering' + lCatering + 'Selected', 'selected="yes"');
 	f_html = f_html.toString().replace(/lCatering.?Selected/g, '');
 
-	var fdiv = document.createElement("div");
-	fdiv.setAttribute("style", "position : absolute; top: 100px; left: 5px; z-index : 10; background: rgb(255, 255, 255); border-bottom-style : dotted; border-bottom-width : 2px; border-left-style : dotted; border-left-width : 2px; border-right-style : dotted; border-right-width : 2px; border-top-style : dotted; border-top-width : 2px;");
+	f_html = f_html.toString().replace('fAdsReplace', fAds);
+	f_html = f_html.toString().replace('fACostReplace', fACost);
+	f_html = f_html.toString().replace('lAds' + lAds + 'Selected', 'selected="yes"');
+	f_html = f_html.toString().replace(/lAds.?Selected/g, '');
+	f_html = f_html.toString().replace('lADay' + lADays + 'Selected', 'selected="yes"');
+	f_html = f_html.toString().replace(/lADay.?Selected/g, '');
 
+	var fdiv = document.createElement("div");
         fdiv.innerHTML = f_html;
 	fFB.appendChild(fdiv);
 
@@ -866,8 +915,14 @@ fill tank<input title="Check this box if you want the script to fill the tank to
 	document.getElementById('fFAmount').addEventListener('change',fFuelASettings,false);
 	document.getElementById('fNote').addEventListener('change',fSettings,false);
 
+	document.getElementById('fAds').addEventListener('change',fASettings,false);
+	document.getElementById('fACost').addEventListener('change',fASettings,false);
+	document.getElementById('lAds').addEventListener('change',fASettings,false);
+	document.getElementById('lADays').addEventListener('change',fASettings,false);
+
+
         if(document.getElementById('fFuelFill').checked === true){
-            document.getElementById('fFAmount').value = 999999999;
+            document.getElementById('fFAmount').value = fFuelTankMax;
             document.getElementById('fFAmount').disabled = true;
         }
 
