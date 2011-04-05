@@ -5,14 +5,14 @@
 // Please see the full GNU General Public License at <http://www.gnu.org/licenses>
 //--------------------------------------------------------------------------------------------------------------------------
 
-// This meta is to allow the script to read the commented lines in between
-// the commented lines are for Greasmonkey to read, but we also need it for 
+// This meta is to allow the script to read the commented lines in between.
+// The commented lines are for Greasmonkey to read, but we also need it for
 // the Check4Update function to get the version number of this script to
 // compare it with the latest version on the server.
 var fap_meta = <><![CDATA[
 // ==UserScript==
 // @name	Airline Manager Auto Pilot
-// @url	http://fadvisor.net/blog/2010/03/auto-pilot/
+// @url		http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace	autopilot
 // @author	Fahad Alduraibi
 // @version	1.2.6a
@@ -156,7 +156,7 @@ function fCheck4Update(){
 
 //function f_FlyWithNoFuel(){
 //    var sURL='http://airlinemanager.activewebs.dk/am/ajax_f_all_new.php?st=all&';
-//    var URL = sURL + FBSession + '&pCode=e66d0f5e96a291791c9f469eb2d77c7d';       // The pCode changes every time, so find away to generate it or use what you have until it expires
+//    var URL = sURL + FBSession + '&pCode=<use here whatever code that was generated last by the game>';       // The pCode changes every time, so find away to generate it or use what you have until it expires
 //
 //    GM_log(URL);
 //    GM_xmlhttpRequest({
@@ -180,11 +180,24 @@ function f_Fly(){
 	window.setTimeout(f_Fly, fDelay+fRand(3000));
     } else{
 	fSL=0;
+
+	// Count the number of flight which are ready (so if we have more than 10 call the fly function again
+	var a_List = d_fly.getElementsByTagName('a');
+	var f_Count = 0;
+	for (var i = 0; i < a_List.length; i++) {
+	    att = a_List[i].getAttribute('onclick');
+	    if (att!== null && att.search(/flightSingle/)>-1){
+		f_Count = f_Count + 1;
+	    }
+	}
+	GM_log('Number of ready flights is ' + f_Count);
+
+	// Look for the Start Routes button and click it
         var d2_fly = document.getElementById('flightStarter');
         if (d2_fly !== null){
             var att;
             var fL=false;
-            var a_List = d2_fly.getElementsByTagName('a');
+            a_List = d2_fly.getElementsByTagName('a');
             for (var i = 0; i < a_List.length; i++) {
                 att = a_List[i].getAttribute('onclick');
                 if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new\.php/)>-1){
@@ -202,8 +215,16 @@ function f_Fly(){
             GM_log('No routes to fly...');
         }
 
-	GM_log('F-done.. see you later');
-	GM_setValue('fProg','');
+
+	if (f_Count > 10){
+	    GM_log('More routes to fly....');
+	    GM_setValue('fProg','Fly');
+	    window.setTimeout(f_openFlight, fDelay+fRand(3000));
+	}
+	else{
+	    GM_log('F-done.. see you later');
+	    GM_setValue('fProg','');
+	}
     }
 }
 
@@ -571,6 +592,7 @@ function BuyFuel(amount){
         onload: function(response) {
             if (response.status === 200){
                 GM_log('I got Fuel');
+		//GM_log(response.responseText);    // Show the response to know if fuel were purchased or maybe money is not enough!
             } else{
                 GM_log('Unable to fetch AM Fuel page');
             }
@@ -578,15 +600,21 @@ function BuyFuel(amount){
     });
 }
 
-function GetFBSession(){
+function GetFBSession(){    // Get the token ID for any link that has the token (some link has a null token, not sure if the token is really needed)
+// E.g: <a onclick="Fetch("fuel.php?tokenD=xXXXxxxXXXxxxXXXxxxXXXx","hfuel","runmeF");" href="javascript:void( 0 );">
+
     var a_List = document.getElementsByTagName('a');
     var pos;
     for (var i = 0; i < a_List.length; i++) {
-	FBSession = a_List[i].getAttribute('href');
+	FBSession = a_List[i].getAttribute('onclick');
+
 	if (FBSession!== null){
-	    pos = FBSession.indexOf('mail.php?');
+	    pos = FBSession.indexOf('fuel.php?');
 	    if (pos >-1){
-		FBSession = FBSession.substring(pos + 9);	    // 9 is the length of the string "mail.php?"
+		FBSession = FBSession.substring(pos + 9);	    // 9 is the length of the string "fuel.php?"
+		pos = FBSession.search(/("|')/);	// Search for the first (") or (')
+		FBSession = FBSession.substring(0, pos);
+		GM_log('Session = ' + FBSession);
 		break;
 	    }
 	}
