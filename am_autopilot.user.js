@@ -154,6 +154,79 @@ function fCheck4Update(){
 //    }
 //}
 
+function f_Ads(){
+    var fDate = new Date();
+    GM_log('old time =' + GM_getValue('fFuelTime') + ' new= ' + fDate.getHours());
+    if (GM_getValue('fFuelTime') !== fDate.getHours() && fDate.getMinutes() > 5){
+	GM_setValue('fFuelTime',  fDate.getHours());
+
+	GM_xmlhttpRequest({
+	    method: 'GET',
+	    url: 'http://airlinemanager.activewebs.dk/am/fuel.php?' + FBSession,
+	    onload: function(response) {
+		if (response.status === 200){
+
+                    var SearchTank = 'Currently in tank:</b></td><td><b style=color:#3fa520>';
+		    var SearchPrice = 'Current fuel price:</td><td><font color=#2b98ec><b>$';
+		    var str = response.responseText;
+
+		    var loc1 = str.indexOf(SearchTank);
+		    if (loc1 > -1){
+			var loc1len = str.indexOf('<', loc1 + SearchTank.length);
+			var Tank = str.substring(loc1 + SearchTank.length, loc1len).replace(/[^0-9]/g, '');
+			GM_log('Tank amount is ' + Tank);
+
+                        var loc2 = str.indexOf(SearchPrice);
+                        if (loc2 > -1){
+                            var loc2len = str.indexOf('<', loc2 + SearchPrice.length);
+                            var Price = str.substring(loc2 + SearchPrice.length, loc2len).replace(/[^0-9]/g, '');
+                            GM_log('Fuel cost is ' + Price);
+
+                            if( Price <= GM_getValue('fFCost')){
+                                var fAmnt
+                                if(GM_getValue('fFuelFill') === 'Checked'){
+                                    fAmnt = fFuelTankMax - Tank;
+                                }else{
+                                    fAmnt = GM_getValue('fFAmount',1000000) - Tank;
+                                }
+
+                                GM_log('Fuel needed = ' + fAmnt);
+                                if( fAmnt > 0 ){
+                                    BuyFuel(fAmnt);
+                                }
+                            }else{
+                                GM_log('Fuel is expensive...  ;(');
+                            }
+
+                        }else{
+                            GM_log('Price not found!! :(');
+                        }
+		    }else{
+			GM_log('TankAmount not found!! :(');
+		    }
+		} else{
+		    GM_log('Unable to fetch AM Fuel page');
+		}
+	    }
+	});
+    }
+}
+
+function BuyAds(amount){
+   GM_xmlhttpRequest({
+        method: 'GET',
+        url: 'http://airlinemanager.activewebs.dk/am/fuel.php?' + FBSession + '&a=' + amount,
+        onload: function(response) {
+            if (response.status === 200){
+                GM_log('I got Fuel');
+		//GM_log(response.responseText);    // Show the response to know if fuel were purchased or maybe money is not enough!
+            } else{
+                GM_log('Unable to fetch AM Fuel page');
+            }
+        }
+    });
+}
+
 //function f_FlyWithNoFuel(){
 //    var sURL='http://airlinemanager.activewebs.dk/am/ajax_f_all_new.php?st=all&';
 //    var URL = sURL + FBSession + '&pCode=<use here whatever code that was generated last by the game>';       // The pCode changes every time, so find away to generate it or use what you have until it expires
@@ -183,9 +256,11 @@ function f_Fly(){
 
 	// Count the number of flight which are ready (so if we have more than 10 call the fly function again
 	var a_List = d_fly.getElementsByTagName('a');
+	GM_log('a_List.length = ' + a_List.length);
 	var f_Count = 0;
 	for (var i = 0; i < a_List.length; i++) {
 	    att = a_List[i].getAttribute('onclick');
+	    GM_log('flightlink = ' + att);
 	    if (att!== null && att.search(/flightSingle/)>-1){
 		f_Count = f_Count + 1;
 	    }
@@ -198,7 +273,7 @@ function f_Fly(){
             var att;
             var fL=false;
             a_List = d2_fly.getElementsByTagName('a');
-            for (var i = 0; i < a_List.length; i++) {
+            for (i = 0; i < a_List.length; i++) {
                 att = a_List[i].getAttribute('onclick');
                 if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new\.php/)>-1){
                     location.assign( 'javascript:' + att + ';void(0)' );
