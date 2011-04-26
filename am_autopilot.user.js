@@ -15,7 +15,7 @@ var fap_meta = <><![CDATA[
 // @url		http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace	autopilot
 // @author	Fahad Alduraibi
-// @version	1.2.6a
+// @version	1.2.6
 // @include	http://apps.facebook.com/airline_manager/*
 // @include	http://airlinemanager.activewebs.dk/am/*
 // @updaters	Fahad Alduraibi, Olla
@@ -920,8 +920,8 @@ function addControls(){
 <td><a title="Open the Note box" href="javascript:;//Open Note" onmousedown='if(document.getElementById("dNote").style.display == "none"){ document.getElementById("dNote").style.display = "table-row"; }else{ document.getElementById("dNote").style.display = "none"; }'>[+]</a>&nbsp;
 <a title="Open the Catering Settings" href="javascript:;//Open Catering" onmousedown='if(document.getElementById("dCatering").style.display == "none"){ document.getElementById("dCatering").style.display = "table-row"; }else{ document.getElementById("dCatering").style.display = "none"; }'>[C]</a>&nbsp;
 <a title="Open the Fuel Settings" href="javascript:;//Open Fuel" onmousedown='if(document.getElementById("dFuel").style.display == "none"){ document.getElementById("dFuel").style.display = "table-row"; }else{ document.getElementById("dFuel").style.display = "none"; }'>[F]</a>&nbsp;
-<a title="Open the Advertising Settings" href="javascript:;//Open Ads" onmousedown='if(document.getElementById("dAds").style.display == "none"){ document.getElementById("dAds").style.display = "table-row"; }else{ document.getElementById("dAds").style.display = "none"; }'>[A]</a>&nbsp;
-<a title="Open the Buy & Sell Aircrafts Settings" href="javascript:;//Open Buy&Sell" onmousedown='if(document.getElementById("dBuySell").style.display == "none"){ document.getElementById("dBuySell").style.display = "table-row"; }else{ document.getElementById("dBuySell").style.display = "none"; }'>[$]</a>&nbsp;
+<a title="* To be implemented * Open the Advertising Settings" href="javascript:;//Open Ads" onmousedown='if(document.getElementById("dAds").style.display == "none"){ document.getElementById("dAds").style.display = "table-row"; }else{ document.getElementById("dAds").style.display = "none"; }'>[A]</a>&nbsp;
+<a title="* To be implemented * Open the Buy & Sell Aircrafts Settings" href="javascript:;//Open Buy&Sell" onmousedown='if(document.getElementById("dBuySell").style.display == "none"){ document.getElementById("dBuySell").style.display = "table-row"; }else{ document.getElementById("dBuySell").style.display = "none"; }'>[$]</a>&nbsp;
 <a title="Visit the script website" href="http://fadvisor.net/blog/2010/03/auto-pilot/">@</a></td><td  id="f_status" style="color: red;"></td>
 </tr>
 <tr id="dCatering" style="display:none">
@@ -938,7 +938,7 @@ fill tank<input title="Check this box if you want the script to fill the tank to
 </tr>
 <tr id="dAds" style="display:none">
 <td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;">
-<input title="Enable buying ads" type="checkbox" name="fAds" fAdsReplace id="fAds" style="margin-top : 0px;">Ads
+<input title="Enable buying ads" type="checkbox" name="fAds" fAdsReplace id="fAds" style="margin-top : 0px;" DISABLED>Ads
   |  If price is or below <input title="The maximum price that you would like to pay for ads, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price)" type="text" name="fACost" value=fACostReplace size="5px" maxlength="5" id="fACost" style="text-align : center;">
   <a title="See the price prediction at this link" href="http://fadvisor.net/blog/2010/06/airlinemanager-ads-prices/"> @</a>
   <br>
@@ -962,7 +962,7 @@ fill tank<input title="Check this box if you want the script to fill the tank to
 <option value="5" lADay5Selected>5 Days</option>
 <option value="6" lADay6Selected>6 Days</option>
 <option value="7" lADay7Selected>7 Days</option>
-</select>
+</select>* To be implemented *
 </td>
 </tr>
 <tr id="dBuySell" style="display:none">
