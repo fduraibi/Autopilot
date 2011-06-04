@@ -11,32 +11,32 @@
 // compare it with the latest version on the server.
 var fap_meta = <><![CDATA[
 // ==UserScript==
-// @name	Airline Manager Auto Pilot
-// @url		http://fadvisor.net/blog/2010/03/auto-pilot/
-// @namespace	autopilot
-// @author	Fahad Alduraibi
-// @version	1.2.7a
-// @include	http://apps.facebook.com/airline_manager/*
-// @include	http://airlinemanager.activewebs.dk/am/*
-// @updaters	Fahad Alduraibi, Olla
+// @name    Airline Manager Auto Pilot
+// @url        http://fadvisor.net/blog/2010/03/auto-pilot/
+// @namespace    autopilot
+// @author    Fahad Alduraibi
+// @version    1.2.7b
+// @include    http://apps.facebook.com/airline_manager/*
+// @include    http://airlinemanager.activewebs.dk/am/*
+// @updaters    Fahad Alduraibi, Olla
 // ==/UserScript==
 ]]></>;
 
-var fDelay=4000;	// A delay value after opening or doing an action (to give the browser sometime to load tha page), this time is in milliseconds, each 1000 milliseconds = 1 second
+var fDelay=4000;    // A delay value after opening or doing an action (to give the browser sometime to load tha page), this time is in milliseconds, each 1000 milliseconds = 1 second
 
-var fmin=0;	// Global variable for the minutes of the counter
-var fsec;	// Global variable for the seconds of the counter
-var ftimeref;	// A refrence to the timer object so we can call it again to stop it
-var fSL=0;	// Global variable used for the number of rounds the script should wait for while loading a page before it stops
-var fML=0;	// Global variable that keep count of how many times the we ran the script after the AM page was loaded. (this is to solve a bug in AM) so after a number of rounds it will just refresh and reload the AM page.
-var FBSession;	// Stores the Facebook settion identifier for the user which AM uses when calling its own links to know the FB user.
+var fmin=0;    // Global variable for the minutes of the counter
+var fsec;    // Global variable for the seconds of the counter
+var ftimeref;    // A refrence to the timer object so we can call it again to stop it
+var fSL=0;    // Global variable used for the number of rounds the script should wait for while loading a page before it stops
+var fML=0;    // Global variable that keep count of how many times the we ran the script after the AM page was loaded. (this is to solve a bug in AM) so after a number of rounds it will just refresh and reload the AM page.
+var FBSession;    // Stores the Facebook settion identifier for the user which AM uses when calling its own links to know the FB user.
 var fFuelTankMax=999999999; // Maximum amount of fuel a normal tank can have (that could change by AM)
 
-function fRand(value){	// Generates a random number between 1 and value (we use it mainly to add a random seconds while calling the AM funstions
+function fRand(value){    // Generates a random number between 1 and value (we use it mainly to add a random seconds while calling the AM funstions
     return Math.floor(Math.random() * (value+1));
 }
 
-function replaceText(sId, sText){	// A the name says, it sets the text of an HTML element if you have its ID
+function replaceText(sId, sText){    // A the name says, it sets the text of an HTML element if you have its ID
     var f_el;
     if (document.getElementById && (f_el = document.getElementById(sId))){
 	while (f_el.hasChildNodes()){
@@ -46,25 +46,28 @@ function replaceText(sId, sText){	// A the name says, it sets the text of an HTM
     }
 }
 
-function stripTags(sText){
-    return sText.replace(/<\/?[^>]+(>|$)/g, " ");
+function stripTags(sText){  // Remove HTML tags (anything in between <*>), and replace any double space with single space
+    return sText.replace(/<\/?[^>]+(>|$)/g, " ").replace('  ', ' ');
 }
 
+function getMyVersion(){
+    tmp = fap_meta.toString().replace(/\n/g,'!_!').replace(/^.*@version\s*/, '').replace(/!_!.*$/, '');
+    return  tmp; 
+}
 
 function fCheck4Update(){
     var fDate = new Date();
-    var fTime = Math.floor(fDate.getTime() / 259200000);	// Convert to 3 days (3 days = 259200000 milliseconds)
+    var fTime = Math.floor(fDate.getTime() / 259200000);    // Convert to 3 days (3 days = 259200000 milliseconds)
     var fOldTime = GM_getValue('fOldTime', '-1');
 
-    //    if (fOldTime === '-1'){	   // The first time assume the user installed the latest version
-    //	fOldTime = fTime;
-    //	GM_setValue('fOldTime',fOldTime);
+    //    if (fOldTime === '-1'){       // The first time assume the user installed the latest version
+    //    fOldTime = fTime;
+    //    GM_setValue('fOldTime',fOldTime);
     //    }
     GM_log('Update -> ' + Math.floor(fDate.getTime() / 259200000));
-    if ( (fTime - fOldTime) > 0){	// Perform the real check every 3 days
+    if ( (fTime - fOldTime) > 0){    // Perform the real check every 3 days
 
-	var fCV = fap_meta.split(/[\n]+/).filter(/@version/).toString().replace(/^[\s\r\n]+|[\s\r\n]+$/g, '').split(/[\s]+/); //Get the line with word @version
-	fCV = fCV[2]; // get the third element
+	fCV = getMyVersion();
 
 	if (GM_getValue('fOldVer') === fCV){
 	    GM_log('You did not update yet!!!!!!! x-(');
@@ -80,7 +83,7 @@ function fCheck4Update(){
 		},
 		onload: function(response) {
 		    if (response.status === 200){
-			var fSV = response.responseText.toString().replace(/^[\s\r\n]+|[\s\r\n]+$/g, '');	// Strip whitespaces and line-feeds
+			var fSV = response.responseText.toString().replace(/^[\s\r\n]+|[\s\r\n]+$/g, '');    // Strip whitespaces and line-feeds
 			GM_log('Response =' + response.responseText);
 			if (fCV === fSV){
 			    GM_setValue('fOldTime',fTime);
@@ -102,37 +105,37 @@ function fCheck4Update(){
 //function f_Ads(){
 //    var d_route = document.getElementById('hroute');
 //    if (d_route === null && fSL < 20){
-//	GM_log('Ads-wait');
-//	fSL++;
-//	window.setTimeout(f_Ads, fDelay+fRand(3000));
+//    GM_log('Ads-wait');
+//    fSL++;
+//    window.setTimeout(f_Ads, fDelay+fRand(3000));
 //    } else{
 //
-//	var i_List = d_route.getElementsByTagName('input');
-//	for (var j = 0; j < i_List.length; j++) {
-//	    att = i_List[j].getAttribute('value');
-//	    if (att!== null && att.toString() === '10'){
-//		i_List[j].checked=true;
-//		var fPrice = i_List[j].parentNode.nextSibling.innerHTML.replace(/[^0-9]/g, '');
-//		var fDate = new Date();
-//		GM_log(fPrice + ',' + (fDate.getMonth()+1) + '/' + fDate.getDate() + ' ' + fDate.getHours() + ':' + fDate.getMinutes())
+//    var i_List = d_route.getElementsByTagName('input');
+//    for (var j = 0; j < i_List.length; j++) {
+//        att = i_List[j].getAttribute('value');
+//        if (att!== null && att.toString() === '10'){
+//        i_List[j].checked=true;
+//        var fPrice = i_List[j].parentNode.nextSibling.innerHTML.replace(/[^0-9]/g, '');
+//        var fDate = new Date();
+//        GM_log(fPrice + ',' + (fDate.getMonth()+1) + '/' + fDate.getDate() + ' ' + fDate.getHours() + ':' + fDate.getMinutes())
 //
-//		GM_xmlhttpRequest({
-//		    method: "POST",
-//		    url: "http://fadvisor.net/am_data.php",
-//		    data: "text=" + (fDate.getMonth()+1) + '/' + fDate.getDate() + ' ' + fDate.getHours() + ':' + fDate.getMinutes() + ',' + fPrice,
-//		    headers: {
-//			"Content-Type": "application/x-www-form-urlencoded"
-//		    },
-//		    onload: function(response) {
-//			GM_log('Ads Post is ' + response.statusText);
-//		    }
-//		});
-//	    }
-//	}
+//        GM_xmlhttpRequest({
+//            method: "POST",
+//            url: "http://fadvisor.net/am_data.php",
+//            data: "text=" + (fDate.getMonth()+1) + '/' + fDate.getDate() + ' ' + fDate.getHours() + ':' + fDate.getMinutes() + ',' + fPrice,
+//            headers: {
+//            "Content-Type": "application/x-www-form-urlencoded"
+//            },
+//            onload: function(response) {
+//            GM_log('Ads Post is ' + response.statusText);
+//            }
+//        });
+//        }
+//    }
 //
-//	GM_setValue('fProg','');
-//	fSL=0;
-//	GM_log('Ads-done');
+//    GM_setValue('fProg','');
+//    fSL=0;
+//    GM_log('Ads-done');
 //    }
 //}
 //
@@ -142,20 +145,20 @@ function fCheck4Update(){
 //    var d_route = document.getElementById('hroute');
 //    var a_List = d_route.getElementsByTagName('a');
 //    for (var i = 0; i < a_List.length; i++) {
-//	att = a_List[i].getAttribute('onclick');
-//	if (att!== null && att.search(/Fetch\('ads\.php/)>-1){
-//	    location.assign( 'javascript:' + att + ';void(0)' );
-//	    GM_log('Found Ads, open it..');
-//	    fSL=0;
-//	    window.setTimeout(f_Ads, fDelay+fRand(3000));
-//	    fL = true;
-//	    break;
-//	}
+//    att = a_List[i].getAttribute('onclick');
+//    if (att!== null && att.search(/Fetch\('ads\.php/)>-1){
+//        location.assign( 'javascript:' + att + ';void(0)' );
+//        GM_log('Found Ads, open it..');
+//        fSL=0;
+//        window.setTimeout(f_Ads, fDelay+fRand(3000));
+//        fL = true;
+//        break;
+//    }
 //    }
 //    if (fL === false && fSL < 20){
-//	GM_log('Ads not found yet...');
-//	fSL++;
-//	window.setTimeout(f_openAds, fDelay+fRand(3000));
+//    GM_log('Ads not found yet...');
+//    fSL++;
+//    window.setTimeout(f_openAds, fDelay+fRand(3000));
 //    }
 //}
 
@@ -238,17 +241,104 @@ function BuyAds(amount){
 //
 //    GM_log(URL);
 //    GM_xmlhttpRequest({
-//	method: 'GET',
-//	url: URL,
-//	onload: function(response) {
-//	    if (response.status === 200){
-//		GM_log('Response =' + response.responseText);
-//	    } else{
-//		GM_log('Unable to Fly the planes');
-//	    }
-//	}
+//    method: 'GET',
+//    url: URL,
+//    onload: function(response) {
+//        if (response.status === 200){
+//        GM_log('Response =' + response.responseText);
+//        } else{
+//        GM_log('Unable to Fly the planes');
+//        }
+//    }
 //    });
 //}
+
+function f_Cargo(){
+    var d_fly = document.getElementById('flight');
+    if (d_fly === null && fSL < 20){
+	GM_log('Cargo-wait');
+	fSL++;
+	window.setTimeout(f_Cargo, fDelay+fRand(3000));
+    } else if ( fSL >= 20 ){
+	reLoadMe();
+    } else{
+	fSL=0;
+
+	// Count the number of flight which are ready (so if we have more than 10 call the fly function again
+	var a_List = d_fly.getElementsByTagName('a');
+	GM_log('Cargo a_List.length = ' + a_List.length);
+
+	if (a_List.length === 1){
+	    GM_log('Cargo a_list is 1!!! try again');
+	    window.setTimeout(f_Fly, fDelay+fRand(3000));
+	} else {
+
+	    var f_Count = 0;
+	    for (var i = 0; i < a_List.length; i++) {
+		att = a_List[i].getAttribute('onclick');
+		if (att!== null && att.search(/flightSingle/)>-1){
+		    f_Count = f_Count + 1;
+		}
+	    }
+	    GM_log('Number of ready Cargo flights is ' + f_Count);
+
+	    // Look for the Start Routes button and click it
+	    var d2_fly = document.getElementById('flightStarter');
+	    if (d2_fly !== null){
+		var att;
+		var fL=false;
+		a_List = d2_fly.getElementsByTagName('a');
+		for (i = 0; i < a_List.length; i++) {
+		    att = a_List[i].getAttribute('onclick');
+		    if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_newC\.php/)>-1){
+			location.assign( 'javascript:' + att + ';void(0)' );
+			GM_log('Fly cargo..');
+			fL = true;
+			break;
+		    }
+		}
+		if (fL === false){
+		    GM_log('Could not find the Cargo link...');
+		}
+	    }
+	    else{
+		GM_log('No cargo routes to fly...');
+	    }
+
+	    if (f_Count > 10){
+		GM_log('More cargo routes to fly....');
+		GM_setValue('fProg','Cargo');
+		window.setTimeout(f_openCargo, fDelay+fRand(3000));
+	    }
+	    else{
+		GM_log('Cargo-done.. see you later');
+		GM_setValue('fProg','');
+	    }
+	}
+    }
+}
+
+function f_openCargo(){
+    var att;
+    var fL=false;
+    var a_List = document.getElementsByTagName('a');
+    for (var i = 0; i < a_List.length; i++) {
+	att = a_List[i].getAttribute('onclick');
+	if (att!== null && att.search(/Fetch\("route_indexC\.php/)>-1){
+	    location.assign( 'javascript:' + att + ';void(0)' );
+	    GM_log('Found Cargo, open it..');
+	    fSL=0;
+	    window.setTimeout(f_Cargo, fDelay+fRand(3000));
+	    fL = true;
+	    break;
+	}
+    }
+    if (fL === false && fSL < 20){
+	GM_log('Cargo not found yet...');
+	fSL++;
+	window.setTimeout(f_openCargo, fDelay+fRand(3000));
+    }
+}
 
 function f_Fly(){
     var d_fly = document.getElementById('flight');
@@ -302,15 +392,20 @@ function f_Fly(){
 		GM_log('No routes to fly...');
 	    }
 
-
 	    if (f_Count > 10){
 		GM_log('More routes to fly....');
 		GM_setValue('fProg','Fly');
 		window.setTimeout(f_openFlight, fDelay+fRand(3000));
 	    }
 	    else{
-		GM_log('F-done.. see you later');
-		GM_setValue('fProg','');
+		if(GM_getValue('fCargo','Checked') === 'Checked'){
+		    GM_log('F-to-Cargo');
+		    GM_setValue('fProg','Cargo');
+		    window.setTimeout(f_openCargo, fDelay+fRand(3000));
+		} else{
+		    GM_log('F-done.. see you later');
+		    GM_setValue('fProg','');
+		}
 	    }
 	}
     }
@@ -345,20 +440,20 @@ function f_openFlight(){
 //    var d_route = document.getElementById('hroute');
 //    var a_List = d_route.getElementsByTagName('a');
 //    for (var i = 0; i < a_List.length; i++) {
-//	att = a_List[i].getAttribute('href');
-//	if (att!== null && att.search('catering.php')>-1){
-//	    location.assign( 'javascript:' + att + ';void(0)' );
-//	    GM_log('Found Catering, open it..');
-//	    fSL=0;
-//	    window.setTimeout(f_Catering, fDelay+fRand(3000));
-//	    fL = true;
-//	    break;
-//	}
+//    att = a_List[i].getAttribute('href');
+//    if (att!== null && att.search('catering.php')>-1){
+//        location.assign( 'javascript:' + att + ';void(0)' );
+//        GM_log('Found Catering, open it..');
+//        fSL=0;
+//        window.setTimeout(f_Catering, fDelay+fRand(3000));
+//        fL = true;
+//        break;
+//    }
 //    }
 //    if (fL === false && fSL < 20){
-//	GM_log('Catering not found yet...');
-//	fSL++;
-//	window.setTimeout(f_openCatering, fDelay+fRand(3000));
+//    GM_log('Catering not found yet...');
+//    fSL++;
+//    window.setTimeout(f_openCatering, fDelay+fRand(3000));
 //    }
 //}
 //
@@ -367,20 +462,20 @@ function f_openFlight(){
 //    var fL=false;
 //    var a_List = document.getElementsByTagName('a');
 //    for (var i = 0; i < a_List.length; i++) {
-//	att = a_List[i].getAttribute('onclick');
-//	if (att!== null && att.search(/Fetch\("route\.php/)>-1){
-//	    location.assign( 'javascript:' + att + ';void(0)' );
-//	    GM_log('Found F1, open it..');
-//	    fSL=0;
-//	    window.setTimeout(f_openCatering, fDelay+fRand(3000));
-//	    fL = true;
-//	    break;
-//	}
+//    att = a_List[i].getAttribute('onclick');
+//    if (att!== null && att.search(/Fetch\("route\.php/)>-1){
+//        location.assign( 'javascript:' + att + ';void(0)' );
+//        GM_log('Found F1, open it..');
+//        fSL=0;
+//        window.setTimeout(f_openCatering, fDelay+fRand(3000));
+//        fL = true;
+//        break;
+//    }
 //    }
 //    if (fL === false && fSL < 20){
-//	GM_log('F1 not found yet...');
-//	fSL++;
-//	window.setTimeout(f_openFlight1, fDelay+fRand(3000));
+//    GM_log('F1 not found yet...');
+//    fSL++;
+//    window.setTimeout(f_openFlight1, fDelay+fRand(3000));
 //    }
 //}
 
@@ -496,7 +591,7 @@ function f_CCheck(){
 	    }
 	}
 	else
-	    reLoadMe(''); //GM_log('Nothing to c-check');
+	    GM_log('Nothing to c-check');
 
 	if(GM_getValue('fRepair','Checked') === 'Checked'){
 	    GM_log('C-call-to-Repair');
@@ -551,7 +646,7 @@ function f_BuyCatering(){
 
 function fBuyAirplane(){
 
-    fSL = fSL + 1;		// don't use the fSL variable, create something new for this function
+    fSL = fSL + 1;        // don't use the fSL variable, create something new for this function
 
     GM_xmlhttpRequest({
 	method: 'POST',
@@ -700,8 +795,8 @@ function GetFBSession(){    // Get the token ID for any link that has the token 
 	if (FBSession!== null){
 	    pos = FBSession.indexOf('fuel.php?');
 	    if (pos >-1){
-		FBSession = FBSession.substring(pos + 9);	    // 9 is the length of the string "fuel.php?"
-		pos = FBSession.search(/("|')/);	// Search for the first (") or (')
+		FBSession = FBSession.substring(pos + 9);        // 9 is the length of the string "fuel.php?"
+		pos = FBSession.search(/("|')/);    // Search for the first (") or (')
 		FBSession = FBSession.substring(0, pos);
 		GM_log('Session = ' + FBSession);
 		break;
@@ -717,8 +812,8 @@ function fPoller(){
 
 	GetFBSession();
 
-	//        fSL = 0;	// fSL should not be used here, create a new global variable to use for buying airplanes
-	//	fBuyAirplane();
+	//        fSL = 0;    // fSL should not be used here, create a new global variable to use for buying airplanes
+	//    fBuyAirplane();
 	//        fSellAirplane();
 	//        return;
 
@@ -762,7 +857,7 @@ function fPoller(){
     window.setTimeout(fPoller, 4000);
 }
 
-function Display(min,sec){	// Format the time as min:sec (mm:ss)
+function Display(min,sec){    // Format the time as min:sec (mm:ss)
     var disp;
     if(min<=9){
 	disp='0'+min+':';
@@ -838,11 +933,11 @@ function wasIrunning(){
     }
 }
 
-function fFuelASettings(){	// Store the fuel setting under Firefox
+function fFuelASettings(){    // Store the fuel setting under Firefox
     GM_setValue('fFAmount',parseInt(document.getElementById('fFAmount').value));
 }
 
-function fCSettings(){	// Store the catering settings under Firefox
+function fCSettings(){    // Store the catering settings under Firefox
     GM_setValue('fCAmount',parseInt(document.getElementById('fCAmount').value));
     GM_setValue('lCatering',parseInt(document.getElementById('lCatering').value));
 
@@ -853,7 +948,7 @@ function fCSettings(){	// Store the catering settings under Firefox
     }
 }
 
-function fASettings(){	// Store the advertising settings under Firefox
+function fASettings(){    // Store the advertising settings under Firefox
     GM_setValue('fACost',parseInt(document.getElementById('fACost').value));
     GM_setValue('lAds',parseInt(document.getElementById('lAds').value));
     GM_setValue('lADays',parseInt(document.getElementById('lADays').value));
@@ -865,7 +960,7 @@ function fASettings(){	// Store the advertising settings under Firefox
     }
 }
 
-function fSettings(){	// Store the script settings under Firefox
+function fSettings(){    // Store the script settings under Firefox
     GM_setValue('fTime',parseInt(document.getElementById('f_timefreq').value));
     GM_setValue('fRTime',parseInt(document.getElementById('f_randtime').value));
     GM_setValue('fNote',document.getElementById('fNote').value);
@@ -898,6 +993,12 @@ function fSettings(){	// Store the script settings under Firefox
     } else{
 	GM_setValue('fCheck', '');
     }
+    
+    if(document.getElementById('fCargo').checked === true){
+	GM_setValue('fCargo', 'Checked');
+    } else{
+	GM_setValue('fCargo', '');
+    }
 }
 
 function addControls(){
@@ -905,16 +1006,17 @@ function addControls(){
     var fAP = document.getElementById('Autopilot');
     var fAM = document.getElementById('accountheader');
 
-    if (fAM !== null){	// Airline Manager frame
+    if (fAM !== null){    // check if this is Airline Manager frame
 	GM_log('AM_Loaded, start polling. l=' + location.href.toString().substr(0, 60));
 	GM_setValue('fLoadAM',1);
 	window.setTimeout(fPoller, fRand(1000));
-    } else if (fFB !== null && fAP === null){    // Facebook frame, check if Controls are not already loaded
+    } else if (fFB !== null && fAP === null){    // check if this is Facebook frame, check if Controls box is not already loaded
 	GM_setValue('fProg','');
 	var fTime=GM_getValue('fTime',8);
 	var fRTime=GM_getValue('fRTime',4);
 	var fRepair=GM_getValue('fRepair','Checked');
 	var fCheck=GM_getValue('fCheck','Checked');
+	var fCargo=GM_getValue('fCargo','Checked');
 	var fCatering=GM_getValue('fCatering','');
 	var lCatering=GM_getValue('lCatering',7);
 	var fCAmount=GM_getValue('fCAmount',55000);
@@ -937,7 +1039,10 @@ function addControls(){
 	<tr><td title="Status of the script (or count down to when it will run next)" id="f_timer" bgcolor="#ff0000" style="text-align : center;">Stopped</td>
 	<td style="border-left-style : dotted; border-left-width : 2px;"><input title="Enable doing c-check on aircrafts before flying them" type="checkbox" name="fCheck" fCheckReplace id="fCheck" style="margin-top : 0px;">C-Check</td>
 	<td><input title="Enable repairing aircrafts before flying them" type="checkbox" name="fRepair" fRepairReplace id="fRepair" style="margin-top : 0px;">Repair</td>
-	</tr></tbody></table>
+	</tr><tr>
+	<td><input title="Enable flying Cargo aircrafts (* only if you have them)" type="checkbox" name="fCargo" fCargoReplace id="fCargo" style="margin-top : 0px;">Fly Cargo</td>
+	</tr>
+	</tbody></table>
 	<table border="0" style="width: 100%;"><tbody><tr>
 	<td><a title="Open the Note box" href="javascript:;//Open Note" onmousedown='if(document.getElementById("dNote").style.display == "none"){ document.getElementById("dNote").style.display = "table-row"; }else{ document.getElementById("dNote").style.display = "none"; }'>[+]</a>&nbsp;
 	<a title="Open the Catering Settings" href="javascript:;//Open Catering" onmousedown='if(document.getElementById("dCatering").style.display == "none"){ document.getElementById("dCatering").style.display = "table-row"; }else{ document.getElementById("dCatering").style.display = "none"; }'>[C]</a>&nbsp;
@@ -1004,6 +1109,7 @@ function addControls(){
 	f_html = f_html.toString().replace('fRTimeReplace', fRTime);
 	f_html = f_html.toString().replace('fRepairReplace', fRepair);
 	f_html = f_html.toString().replace('fCheckReplace', fCheck);
+	f_html = f_html.toString().replace('fCargoReplace', fCargo);
 	f_html = f_html.toString().replace('fCateringReplace', fCatering);
 	f_html = f_html.toString().replace('fCAmountReplace', fCAmount);
 	f_html = f_html.toString().replace('fFuelReplace', fFuel);
@@ -1011,7 +1117,7 @@ function addControls(){
 	f_html = f_html.toString().replace('fFuelFillReplace', fFuelFill);
 	f_html = f_html.toString().replace('fFAmountReplace', fFAmount);
 	f_html = f_html.toString().replace('fNoteReplace', fNote);
-	
+    
 	f_html = f_html.toString().replace('lCatering' + lCatering + 'Selected', 'selected="yes"');
 	f_html = f_html.toString().replace(/lCatering.?Selected/g, '');
 
@@ -1031,6 +1137,7 @@ function addControls(){
 	document.getElementById('f_randtime').addEventListener('change',fSettings,false);
 	document.getElementById('fRepair').addEventListener('change',fSettings,false);
 	document.getElementById('fCheck').addEventListener('change',fSettings,false);
+	document.getElementById('fCargo').addEventListener('change',fSettings,false);
 	document.getElementById('fCatering').addEventListener('change',fCSettings,false);
 	document.getElementById('lCatering').addEventListener('change',fCSettings,false);
 	document.getElementById('fCAmount').addEventListener('change',fCSettings,false);
@@ -1052,6 +1159,7 @@ function addControls(){
 	}
 
 	fCheck4Update();
+
 	GM_log('FB Controls loaded...l=' + location.href.toString());
 	window.setTimeout(wasIrunning, fDelay);
     }
