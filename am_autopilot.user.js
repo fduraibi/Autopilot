@@ -15,7 +15,7 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.7b1
+// @version    1.2.7
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
 // @updaters    Fahad Alduraibi, Olla
