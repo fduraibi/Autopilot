@@ -15,7 +15,7 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.7
+// @version    1.2.8a
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
 // @updaters    Fahad Alduraibi, Olla
@@ -35,6 +35,13 @@ var fFuelTankMax=999999999; // Maximum amount of fuel a normal tank can have (th
 
 function fRand(value){    // Generates a random number between 1 and value (we use it mainly to add a random seconds while calling the AM funstions
     return Math.floor(Math.random() * (value+1));
+}
+
+function isSSL(){
+    if (window.location.protocol === 'https:')
+	return true;
+    else
+	return false;
 }
 
 function replaceText(sId, sText){    // A the name says, it sets the text of an HTML element if you have its ID
@@ -61,10 +68,6 @@ function fCheck4Update(){
     var fTime = Math.floor(fDate.getTime() / 259200000);    // Convert to 3 days (3 days = 259200000 milliseconds)
     var fOldTime = GM_getValue('fOldTime', '-1');
 
-    //    if (fOldTime === '-1'){       // The first time assume the user installed the latest version
-    //    fOldTime = fTime;
-    //    GM_setValue('fOldTime',fOldTime);
-    //    }
     GM_log('Update -> ' + Math.floor(fDate.getTime() / 259200000));
     if ( (fTime - fOldTime) > 0){    // Perform the real check every 3 days
 
@@ -236,24 +239,6 @@ function BuyAds(amount){
     });
 }
 
-//function f_FlyWithNoFuel(){
-//    var sURL='http://airlinemanager.activewebs.dk/am/ajax_f_all_new.php?st=all&';
-//    var URL = sURL + FBSession + '&pCode=<use here whatever code that was generated last by the game>';       // The pCode changes every time, so find away to generate it or use what you have until it expires
-//
-//    GM_log(URL);
-//    GM_xmlhttpRequest({
-//    method: 'GET',
-//    url: URL,
-//    onload: function(response) {
-//        if (response.status === 200){
-//        GM_log('Response =' + response.responseText);
-//        } else{
-//        GM_log('Unable to Fly the planes');
-//        }
-//    }
-//    });
-//}
-
 function f_Cargo(){
     var d_fly = document.getElementById('flight');
     if (d_fly === null && fSL < 20){
@@ -261,7 +246,7 @@ function f_Cargo(){
 	fSL++;
 	window.setTimeout(f_Cargo, fDelay+fRand(fRandomDelayMax));
     } else if ( fSL >= 20 ){
-	reLoadMe();
+	reLoadMe('');
     } else{
 	fSL=0;
 
@@ -339,6 +324,8 @@ function f_openCargo(){
 	fSL++;
 	window.setTimeout(f_openCargo, fDelay+fRand(fRandomDelayMax));
     }
+    else if ( fSL >= 20 )
+	reLoadMe('');
 }
 
 function f_Fly(){
@@ -348,7 +335,7 @@ function f_Fly(){
 	fSL++;
 	window.setTimeout(f_Fly, fDelay+fRand(fRandomDelayMax));
     } else if ( fSL >= 20 ){
-	reLoadMe();
+	reLoadMe('');
     } else{
 	fSL=0;
 
@@ -433,52 +420,9 @@ function f_openFlight(){
 	fSL++;
 	window.setTimeout(f_openFlight, fDelay+fRand(fRandomDelayMax));
     }
+    else if ( fSL >= 20 )
+	reLoadMe('');
 }
-
-//function f_openCatering(){        // Not using this function anymore since i do direct calls now to buy catering
-//    var att;
-//    var fL=false;
-//    var d_route = document.getElementById('hroute');
-//    var a_List = d_route.getElementsByTagName('a');
-//    for (var i = 0; i < a_List.length; i++) {
-//    att = a_List[i].getAttribute('href');
-//    if (att!== null && att.search('catering.php')>-1){
-//        location.assign( 'javascript:' + att + ';void(0)' );
-//        GM_log('Found Catering, open it..');
-//        fSL=0;
-//        window.setTimeout(f_Catering, fDelay+fRand(fRandomDelayMax));
-//        fL = true;
-//        break;
-//    }
-//    }
-//    if (fL === false && fSL < 20){
-//    GM_log('Catering not found yet...');
-//    fSL++;
-//    window.setTimeout(f_openCatering, fDelay+fRand(fRandomDelayMax));
-//    }
-//}
-//
-//function f_openFlight1(){
-//    var att;
-//    var fL=false;
-//    var a_List = document.getElementsByTagName('a');
-//    for (var i = 0; i < a_List.length; i++) {
-//    att = a_List[i].getAttribute('onclick');
-//    if (att!== null && att.search(/Fetch\("route\.php/)>-1){
-//        location.assign( 'javascript:' + att + ';void(0)' );
-//        GM_log('Found F1, open it..');
-//        fSL=0;
-//        window.setTimeout(f_openCatering, fDelay+fRand(fRandomDelayMax));
-//        fL = true;
-//        break;
-//    }
-//    }
-//    if (fL === false && fSL < 20){
-//    GM_log('F1 not found yet...');
-//    fSL++;
-//    window.setTimeout(f_openFlight1, fDelay+fRand(fRandomDelayMax));
-//    }
-//}
 
 function f_Repair(){
     var att;
@@ -487,7 +431,9 @@ function f_Repair(){
 	GM_log('R-wait');
 	fSL++;
 	window.setTimeout(f_Repair, fDelay+fRand(fRandomDelayMax));
-    } else{
+    } else if ( fSL >= 20 )
+	reLoadMe('');
+    else{
 	fSL=0;
 	var d_repall = document.getElementById('damage_all');
 	if (d_repall !== null){
@@ -548,7 +494,8 @@ function f_openRepair(){
 	GM_log('R not found yet... l=' + location.href);
 	fSL++;
 	window.setTimeout(f_openRepair, fDelay+fRand(fRandomDelayMax));
-    }
+    } else if ( fSL >= 20 )
+	reLoadMe('');
 }
 
 function f_CCheck(){
@@ -558,7 +505,9 @@ function f_CCheck(){
 	GM_log('C-wait');
 	fSL++;
 	window.setTimeout(f_CCheck, fDelay+fRand(fRandomDelayMax));
-    } else{
+    } else if ( fSL >= 20 )
+	reLoadMe('');
+    else{
 	fSL=0;
 	var d_repall = document.getElementById('check_all');
 	if (d_repall !== null){
@@ -625,11 +574,17 @@ function f_openCCheck(){
 	GM_log('C not found yet...');
 	fSL++;
 	window.setTimeout(f_openCCheck, fDelay+fRand(fRandomDelayMax));
-    }
+    } else if ( fSL >= 20 )
+	reLoadMe('');
 }
 
-function f_BuyCatering(){
-    var sURL='http://airlinemanager.activewebs.dk/am/catering_purchase.php?';
+function f_BuyCatering(){ 
+    var sURL;
+    if (isSSL())
+	sURL='https://airlinemanager.activewebs.dk/am/catering_purchase.php?';
+    else
+	sURL='http://airlinemanager.activewebs.dk/am/catering_purchase.php?';
+    
     var URL = sURL + FBSession + '&id=' + GM_getValue('lCatering',7) + '&am=' + GM_getValue('fCAmount',55000);
 
     GM_xmlhttpRequest({
@@ -712,72 +667,82 @@ function fSellAirplane2(){
 }
 
 function f_Fuel(){
-    var fDate = new Date();
-    GM_log('old time =' + GM_getValue('fFuelTime') + ' new= ' + fDate.getHours());
-    if (GM_getValue('fFuelTime') !== fDate.getHours() && fDate.getMinutes() > 5){
+    var fAmnt
+    var sURL;
+    if (isSSL())
+	sURL='https://airlinemanager.activewebs.dk/am/fuel.php?' + FBSession;
+    else
+	sURL='http://airlinemanager.activewebs.dk/am/fuel.php?' + FBSession;
 
-	GM_xmlhttpRequest({
-	    method: 'GET',
-	    url: 'http://airlinemanager.activewebs.dk/am/fuel.php?' + FBSession,
-	    onload: function(response) {
-		if (response.status === 200){
+    GM_xmlhttpRequest({
+	method: 'GET',
+	url: sURL,
+	onload: function(response) {
+	    if (response.status === 200){
 
-		    var SearchTank = 'Currently in tank:</b></td><td><b style=color:#3fa520>';
-		    var SearchPrice = 'Current fuel price:</td><td><font color=#2b98ec><b>$';
-		    var str = response.responseText;
+		var SearchTank = '<b>Currently in tank:</b></td><td><b style=color:#3fa520>';
+		var SearchPrice = '<b>Current fuel price:</td><td><font color=#2b98ec><b>$';
+		var str = response.responseText;
 
-		    var loc1 = str.indexOf(SearchTank);
-		    if (loc1 > -1){
-			var loc1len = str.indexOf('<', loc1 + SearchTank.length);
-			var Tank = str.substring(loc1 + SearchTank.length, loc1len).replace(/[^0-9]/g, '');
-			GM_log('Tank amount is ' + Tank);
+		var loc1 = str.indexOf(SearchTank);
+		if (loc1 > -1){
+		    var loc1len = str.indexOf('<', loc1 + SearchTank.length);
+		    var Tank = str.substring(loc1 + SearchTank.length, loc1len).replace(/[^0-9\-]/g, '');
+		    GM_log('Tank amount is ' + Tank);
 
-			var loc2 = str.indexOf(SearchPrice);
-			if (loc2 > -1){
-			    var loc2len = str.indexOf('<', loc2 + SearchPrice.length);
-			    var Price = str.substring(loc2 + SearchPrice.length, loc2len).replace(/[^0-9]/g, '');
-			    GM_log('Fuel cost is ' + Price);
+		    var loc2 = str.indexOf(SearchPrice);
+		    if (loc2 > -1){
+			var loc2len = str.indexOf('<', loc2 + SearchPrice.length);
+			var Price = str.substring(loc2 + SearchPrice.length, loc2len).replace(/[^0-9]/g, '');
+			GM_log('Fuel cost is ' + Price);
 
-			    GM_setValue('fFuelTime',  fDate.getHours());    // Save the current time, so the fuel function will not run again until the next hour
-
-			    if( Price <= GM_getValue('fFCost')){
-				var fAmnt
-				if(GM_getValue('fFuelFill') === 'Checked'){
-				    fAmnt = fFuelTankMax - Tank;
-				}else{
-				    fAmnt = GM_getValue('fFAmount',1000000) - Tank;
-				}
-
-				GM_log('Fuel needed = ' + fAmnt);
-				if( fAmnt > 0 ){
-				    BuyFuel(fAmnt);
-				}
+			if( Price <= GM_getValue('fFCost')){
+			    if(GM_getValue('fFuelFill') === 'Checked'){
+				fAmnt = fFuelTankMax - Tank;
 			    }else{
-				GM_log('Fuel is expensive...  ;(');
+				fAmnt = GM_getValue('fFAmount',1000000) - Tank;
 			    }
 
+			    GM_log('Fuel needed = ' + fAmnt);
+			    if( fAmnt > 0 ){
+				BuyFuel(fAmnt);
+			    }
 			}else{
-			    GM_log('Price not found!! :(');
+			    GM_log('Fuel is expensive...  ;(');
+			    if (Tank < 1 && GM_getValue('fFuelRescue') === 'Checked'){
+				fAmnt = (Tank * -1) + 1;
+				GM_log('We need ' + fAmnt + ' Lbs of fuel no matter what the price is X-(')
+				BuyFuel(fAmnt);
+			    }
 			}
+
 		    }else{
-			GM_log('TankAmount not found!! :(');
+			GM_log('Price not found!! :(');
 		    }
-		} else{
-		    GM_log('Unable to fetch AM Fuel page');
+		}else{
+		    GM_log('TankAmount not found!! :(');
 		}
+	    } else{
+		GM_log('Unable to fetch AM Fuel page');
 	    }
-	});
-    }
+	}
+    });
 }
 
 function BuyFuel(amount){
+    var sURL;
+    if (isSSL())
+	sURL='https://airlinemanager.activewebs.dk/am/fuel.php?' + FBSession + '&a=' + amount;
+    else
+	sURL='http://airlinemanager.activewebs.dk/am/fuel.php?' + FBSession + '&a=' + amount;
+    
     GM_xmlhttpRequest({
 	method: 'GET',
-	url: 'http://airlinemanager.activewebs.dk/am/fuel.php?' + FBSession + '&a=' + amount,
+	url: sURL,
 	onload: function(response) {
 	    if (response.status === 200){
 		GM_log('I got Fuel');
-	    //GM_log(response.responseText);    // Show the response to know if fuel were purchased or maybe money is not enough!
+	    //		GM_log('Response = ' + stripTags(response.responseText));    // Show the response to know if fuel were purchased or maybe money is not enough!
 	    } else{
 		GM_log('Unable to fetch AM Fuel page');
 	    }
@@ -812,11 +777,6 @@ function fPoller(){
 	GM_log('Start');
 
 	GetFBSession();
-
-	//        fSL = 0;    // fSL should not be used here, create a new global variable to use for buying airplanes
-	//    fBuyAirplane();
-	//        fSellAirplane();
-	//        return;
 
 	if(GM_getValue('fFuel') === 'Checked'){
 	    GM_log('Check Fuel...');
@@ -880,8 +840,14 @@ function reLoadMe(Msg){
     }
     GM_log(Msg);
     GM_setValue('fRun','resume');
-    //location.reload(true);
-    location.href="http://apps.facebook.com/airline_manager/";
+    //    window.location.reload(false);	//not good, shows a popup message asking the user to resend data!
+    
+    var sURL;
+    if (isSSL())
+	sURL='https://apps.facebook.com/airline_manager/';
+    else
+	sURL='http://apps.facebook.com/airline_manager/';
+    window.parent.location.href = sURL;
 }
 
 function ff_Countdown(){
@@ -976,7 +942,13 @@ function fSettings(){    // Store the script settings under Firefox
 	document.getElementById('fFAmount').value = GM_getValue('fFAmount',1000000);
 	document.getElementById('fFAmount').disabled = false;
     }
-
+    
+    if(document.getElementById('fFuelRescue').checked === true){
+	GM_setValue('fFuelRescue', 'Checked');
+    } else{
+	GM_setValue('fFuelRescue', '');
+    }
+    
     if(document.getElementById('fFuel').checked === true){
 	GM_setValue('fFuel', 'Checked');
     } else{
@@ -1023,6 +995,7 @@ function addControls(){
 	var fCAmount=GM_getValue('fCAmount',55000);
 	var fFuel=GM_getValue('fFuel','');
 	var fFuelFill=GM_getValue('fFuelFill','');
+	var fFuelRescue=GM_getValue('fFuelRescue','');
 	var fFCost=GM_getValue('fFCost',400);
 	var fFAmount=GM_getValue('fFAmount',1000000);
 	var fAds=GM_getValue('fAds','');
@@ -1038,10 +1011,10 @@ function addControls(){
 	<td style="border-left-style : dotted; border-left-width : 2px;"><input title="Time to wait between each run" type="text" name="f_timefreq" value=fTimeReplace size="1px" maxlength="2" id="f_timefreq" style="text-align : center;">min +</td>
 	<td>Random<input title="A random value (between 0 & what you set) added to the wait time." type="text" name="f_randtime" value=fRTimeReplace size="1px" maxlength="2" id="f_randtime" style="text-align : center;" alt="Random Time"></td></tr>
 	<tr><td rowspan="2" title="Status of the script (or count down to when it will run next)" id="f_timer" bgcolor="#ff0000" style="text-align : center;">Stopped</td>
-	<td style="border-left-style : dotted; border-left-width : 2px;"><input title="Enable doing c-check on aircrafts before flying them" type="checkbox" name="fCheck" fCheckReplace id="fCheck" style="margin-top : 0px;">C-Check</td>
-	<td><input title="Enable repairing aircrafts before flying them" type="checkbox" name="fRepair" fRepairReplace id="fRepair" style="margin-top : 0px;">Repair</td>
+	<td style="border-left-style : dotted; border-left-width : 2px;"><input title="Enable doing c-check on aircraft before flying them" type="checkbox" name="fCheck" fCheckReplace id="fCheck" style="margin-top : 0px;">C-Check</td>
+	<td><input title="Enable repairing aircraft before flying them" type="checkbox" name="fRepair" fRepairReplace id="fRepair" style="margin-top : 0px;">Repair</td>
 	</tr><tr>
-	<td style="border-left-style : dotted; border-left-width : 2px;"><input title="Enable flying Cargo aircrafts (* only if you have them)" type="checkbox" name="fCargo" fCargoReplace id="fCargo" style="margin-top : 0px;">Fly Cargo</td>
+	<td style="border-left-style : dotted; border-left-width : 2px;"><input title="Enable flying Cargo aircraft (* only if you have them)" type="checkbox" name="fCargo" fCargoReplace id="fCargo" style="margin-top : 0px;">Fly Cargo</td>
 	</tr>
 	</tbody></table>
 	<table border="0" style="width: 100%;"><tbody><tr>
@@ -1049,20 +1022,21 @@ function addControls(){
 	<a title="Open the Catering Settings" href="javascript:;//Open Catering" onmousedown='if(document.getElementById("dCatering").style.display == "none"){ document.getElementById("dCatering").style.display = "table-row"; }else{ document.getElementById("dCatering").style.display = "none"; }'>[C]</a>&nbsp;
 	<a title="Open the Fuel Settings" href="javascript:;//Open Fuel" onmousedown='if(document.getElementById("dFuel").style.display == "none"){ document.getElementById("dFuel").style.display = "table-row"; }else{ document.getElementById("dFuel").style.display = "none"; }'>[F]</a>&nbsp;
 	<a title="* To be implemented * Open the Advertising Settings" href="javascript:;//Open Ads" onmousedown='if(document.getElementById("dAds").style.display == "none"){ document.getElementById("dAds").style.display = "table-row"; }else{ document.getElementById("dAds").style.display = "none"; }'>[A]</a>&nbsp;
-	<a title="* To be implemented * Open the Buy & Sell Aircrafts Settings" href="javascript:;//Open Buy&Sell" onmousedown='if(document.getElementById("dBuySell").style.display == "none"){ document.getElementById("dBuySell").style.display = "table-row"; }else{ document.getElementById("dBuySell").style.display = "none"; }'>[$]</a>&nbsp;
+	<a title="* To be implemented * Open the Buy & Sell Aircraft Settings" href="javascript:;//Open Buy&Sell" onmousedown='if(document.getElementById("dBuySell").style.display == "none"){ document.getElementById("dBuySell").style.display = "table-row"; }else{ document.getElementById("dBuySell").style.display = "none"; }'>[$]</a>&nbsp;
 	<a title="Visit the script website" href="http://fadvisor.net/blog/2010/03/auto-pilot/">@</a></td><td  id="f_status" style="color: red;"></td>
 	</tr>
 	<tr id="dCatering" style="display:none">
-	<td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;"><input title="Enable buying catering before flying the aircrafts (will only buy if you don't have any)" type="checkbox" name="fCatering" fCateringReplace id="fCatering" style="margin-top : 0px;">Catering<br>
+	<td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;"><input title="Enable buying catering before flying the aircraft (will only buy if you don't have any)" type="checkbox" name="fCatering" fCateringReplace id="fCatering" style="margin-top : 0px;">Catering<br>
 	<select title="Select the type of catering you like to buy" id="lCatering"><option value="7" lCatering7Selected>7- Sky+</option><option value="6" lCatering6Selected>6- Sky Catering</option><option value="5" lCatering5Selected>5- Sky Burgers</option>
 	<option value="4" lCatering4Selected>4- Fast Food</option><option value="3" lCatering3Selected>3- Sky Fish</option><option value="2" lCatering2Selected>2- Cloud Chefs</option><option value="1" lCatering1Selected>1- AM Catering</option></select>
 	Amount<input title="Set the amount of catering to buy (you should follow the min & max values set by the game)" type="text" name="fCAmount" value=fCAmountReplace size="4px" maxlength="5" id="fCAmount" style="text-align : center;"></td>
 	</tr>
 	<tr id="dFuel" style="display:none">
-	<td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;"><input title="Enable buying fuel" type="checkbox" name="fFuel" fFuelReplace id="fFuel" style="margin-top : 0px;">Fuel
-	|  If price is or below <input title="The maximum price that you would like to pay for fuel, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price)" type="text" name="fFCost" value=fFCostReplace size="4px" maxlength="4" id="fFCost" style="text-align : center;"><br>
+	<td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;"><input title="Enable buying fuel" type="checkbox" name="fFuel" fFuelReplace id="fFuel" style="margin-top : 0px;">Fuel&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+	If price is or below <input title="The maximum price that you would like to pay for fuel, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price)" type="text" name="fFCost" value=fFCostReplace size="4px" maxlength="4" id="fFCost" style="text-align : center;"><br>
 	fill tank<input title="Check this box if you want the script to fill the tank to the maximum when the price is what you want" type="checkbox" name="fFuelFill" fFuelFillReplace id="fFuelFill" style="margin-top : 0px;">
-	or fill up to <input title="The desired amount of fuel that you want to have in your tank" type="text" name="fFAmount" value=fFAmountReplace size="9px" maxlength="9" id="fFAmount" style="text-align : center;"></td>
+	or fill up to <input title="The desired amount of fuel that you want to have in your tank" type="text" name="fFAmount" value=fFAmountReplace size="9px" maxlength="9" id="fFAmount" style="text-align : center;"><br>
+	<input title="If the tank is empty then buy enough fuel to fly the aircraft even if it is expensive" type="checkbox" name="fFuelRescue" fFuelRescueReplace id="fFuelRescue" style="margin-top : 0px;">Fuel Rescue</td>
 	</tr>
 	<tr id="dAds" style="display:none">
 	<td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;">
@@ -1095,7 +1069,7 @@ function addControls(){
 	</tr>
 	<tr id="dBuySell" style="display:none">
 	<td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;">
-	Reserved for Buying and Selling aircrafts
+	Reserved for Buying and Selling aircraft
 	<br>
 	* To be implemented *
 	</td>
@@ -1114,6 +1088,7 @@ function addControls(){
 	f_html = f_html.toString().replace('fCateringReplace', fCatering);
 	f_html = f_html.toString().replace('fCAmountReplace', fCAmount);
 	f_html = f_html.toString().replace('fFuelReplace', fFuel);
+	f_html = f_html.toString().replace('fFuelRescueReplace', fFuelRescue);
 	f_html = f_html.toString().replace('fFCostReplace', fFCost);
 	f_html = f_html.toString().replace('fFuelFillReplace', fFuelFill);
 	f_html = f_html.toString().replace('fFAmountReplace', fFAmount);
@@ -1144,6 +1119,7 @@ function addControls(){
 	document.getElementById('fCAmount').addEventListener('change',fCSettings,false);
 	document.getElementById('fFuel').addEventListener('change',fSettings,false);
 	document.getElementById('fFuelFill').addEventListener('change',fSettings,false);
+	document.getElementById('fFuelRescue').addEventListener('change',fSettings,false);
 	document.getElementById('fFCost').addEventListener('change',fSettings,false)
 	document.getElementById('fFAmount').addEventListener('change',fFuelASettings,false);
 	document.getElementById('fNote').addEventListener('change',fSettings,false);
@@ -1166,4 +1142,3 @@ function addControls(){
     }
 }
 window.setTimeout(addControls, fDelay);
-//GM_log('s-load.. ->  l=' + location.href.toString().substr(0, 60));
