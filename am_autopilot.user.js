@@ -15,10 +15,10 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.8a
+// @version    1.2.8b
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
-// @updaters    Fahad Alduraibi, Olla
+// @ThanksTo    Olla, Luke, [All of you users and commenters]
 // ==/UserScript==
 ]]></>;
 
@@ -52,6 +52,28 @@ function replaceText(sId, sText){    // A the name says, it sets the text of an 
 	}
 	f_el.appendChild(document.createTextNode(sText));
     }
+}
+
+var divObj = new Object();  // The DIV object for the controlbox
+function moveMe(event){
+    divObj.DIV = document.getElementById('fAMAP');	
+    divObj.Left  = parseInt(divObj.DIV.style.left) - event.pageX;
+    divObj.Top   = parseInt(divObj.DIV.style.top) - event.pageY;
+
+    document.getElementById('fTbl1').addEventListener("mousemove", moveStart, true);
+    document.getElementById('fTbl1').addEventListener("mouseup", moveStop, false);
+}
+
+function moveStart(event){
+    divObj.DIV.style.left = (divObj.Left + event.pageX).toString() + "px";
+    divObj.DIV.style.top = (divObj.Top  + event.pageY).toString() + "px";
+}
+
+function moveStop(){
+    document.getElementById('fTbl1').removeEventListener("mousemove", moveStart, true);
+    document.getElementById('fTbl1').removeEventListener("mouseup", moveStop, false);
+    GM_setValue('fX-POS', divObj.DIV.style.left);
+    GM_setValue('fY-POS', divObj.DIV.style.top);
 }
 
 function stripTags(sText){  // Remove HTML tags (anything in between <*>), and replace any double space with single space
@@ -983,41 +1005,22 @@ function addControls(){
 	GM_log('AM_Loaded, start polling. l=' + location.href.toString().substr(0, 60));
 	GM_setValue('fLoadAM',1);
 	window.setTimeout(fPoller, fRand(1000));
-    } else if (fFB !== null && fAP === null){    // check if this is Facebook frame, check if Controls box is not already loaded
+    } else if (fFB !== null && fAP === null){    // check if this is Facebook frame, and check if Controls box is not already loaded
 	GM_setValue('fProg','');
-	var fTime=GM_getValue('fTime',8);
-	var fRTime=GM_getValue('fRTime',4);
-	var fRepair=GM_getValue('fRepair','Checked');
-	var fCheck=GM_getValue('fCheck','Checked');
-	var fCargo=GM_getValue('fCargo','');
-	var fCatering=GM_getValue('fCatering','');
-	var lCatering=GM_getValue('lCatering',7);
-	var fCAmount=GM_getValue('fCAmount',55000);
-	var fFuel=GM_getValue('fFuel','');
-	var fFuelFill=GM_getValue('fFuelFill','');
-	var fFuelRescue=GM_getValue('fFuelRescue','');
-	var fFCost=GM_getValue('fFCost',400);
-	var fFAmount=GM_getValue('fFAmount',1000000);
-	var fAds=GM_getValue('fAds','');
-	var lAds=GM_getValue('lAds',9);
-	var lADays=GM_getValue('lADays',7);
-	var fACost=GM_getValue('fACost',7500);
-	var fNote=GM_getValue('fNote','Use this area to save notes');
 
 	var f_html = <><![CDATA[
-	<div style="position: absolute; top: 100px; left: 5px; z-index: 10; background: none repeat scroll 0% 0% rgb(255, 255, 255); border-style: dotted; border-width: 2px;">
-	<table border="0" style="border-bottom-style : dotted; border-bottom-width : 2px;"><tbody><tr>
+	<div id="fAMAP" style="position: absolute; top: [Y-POS]; left: [X-POS]; z-index: 100; background: none repeat scroll 0% 0% rgb(255, 255, 255); border-style: dotted; border-width: 2px;">
+	<table id="fTbl1" border="0" style="border-bottom-style : dotted; border-bottom-width : 2px;"><tbody><tr>
 	<td><input title="Start or Stop the script" type="button" id="Autopilot" value="Autopilot"></td>
 	<td style="border-left-style : dotted; border-left-width : 2px;"><input title="Time to wait between each run" type="text" name="f_timefreq" value=fTimeReplace size="1px" maxlength="2" id="f_timefreq" style="text-align : center;">min +</td>
-	<td>Random<input title="A random value (between 0 & what you set) added to the wait time." type="text" name="f_randtime" value=fRTimeReplace size="1px" maxlength="2" id="f_randtime" style="text-align : center;" alt="Random Time"></td></tr>
-	<tr><td rowspan="2" title="Status of the script (or count down to when it will run next)" id="f_timer" bgcolor="#ff0000" style="text-align : center;">Stopped</td>
+	<td colspan=2>Random<input title="A random value (between 0 & what you set) added to the wait time." type="text" name="f_randtime" value=fRTimeReplace size="1px" maxlength="2" id="f_randtime" style="text-align : center;" alt="Random Time"></td></tr>
+	<tr><td title="Status of the script (or count down to when it will run next)" id="f_timer" bgcolor="#ff0000" style="text-align : center;">Stopped</td>
 	<td style="border-left-style : dotted; border-left-width : 2px;"><input title="Enable doing c-check on aircraft before flying them" type="checkbox" name="fCheck" fCheckReplace id="fCheck" style="margin-top : 0px;">C-Check</td>
 	<td><input title="Enable repairing aircraft before flying them" type="checkbox" name="fRepair" fRepairReplace id="fRepair" style="margin-top : 0px;">Repair</td>
-	</tr><tr>
-	<td style="border-left-style : dotted; border-left-width : 2px;"><input title="Enable flying Cargo aircraft (* only if you have them)" type="checkbox" name="fCargo" fCargoReplace id="fCargo" style="margin-top : 0px;">Fly Cargo</td>
+	<td><input title="Enable flying Cargo aircraft (* only if you have them)" type="checkbox" name="fCargo" fCargoReplace id="fCargo" style="margin-top : 0px;">Fly Cargo</td>
 	</tr>
 	</tbody></table>
-	<table border="0" style="width: 100%;"><tbody><tr>
+	<table id="fTbl2" border="0" style="width: 100%;"><tbody><tr>
 	<td><a title="Open the Note box" href="javascript:;//Open Note" onmousedown='if(document.getElementById("dNote").style.display == "none"){ document.getElementById("dNote").style.display = "table-row"; }else{ document.getElementById("dNote").style.display = "none"; }'>[+]</a>&nbsp;
 	<a title="Open the Catering Settings" href="javascript:;//Open Catering" onmousedown='if(document.getElementById("dCatering").style.display == "none"){ document.getElementById("dCatering").style.display = "table-row"; }else{ document.getElementById("dCatering").style.display = "none"; }'>[C]</a>&nbsp;
 	<a title="Open the Fuel Settings" href="javascript:;//Open Fuel" onmousedown='if(document.getElementById("dFuel").style.display == "none"){ document.getElementById("dFuel").style.display = "table-row"; }else{ document.getElementById("dFuel").style.display = "none"; }'>[F]</a>&nbsp;
@@ -1080,34 +1083,37 @@ function addControls(){
 	</div>
 	]]></>;
 
-	f_html = f_html.toString().replace('fTimeReplace', fTime);
-	f_html = f_html.toString().replace('fRTimeReplace', fRTime);
-	f_html = f_html.toString().replace('fRepairReplace', fRepair);
-	f_html = f_html.toString().replace('fCheckReplace', fCheck);
-	f_html = f_html.toString().replace('fCargoReplace', fCargo);
-	f_html = f_html.toString().replace('fCateringReplace', fCatering);
-	f_html = f_html.toString().replace('fCAmountReplace', fCAmount);
-	f_html = f_html.toString().replace('fFuelReplace', fFuel);
-	f_html = f_html.toString().replace('fFuelRescueReplace', fFuelRescue);
-	f_html = f_html.toString().replace('fFCostReplace', fFCost);
-	f_html = f_html.toString().replace('fFuelFillReplace', fFuelFill);
-	f_html = f_html.toString().replace('fFAmountReplace', fFAmount);
-	f_html = f_html.toString().replace('fNoteReplace', fNote);
+	f_html = f_html.toString().replace('[Y-POS]', GM_getValue('fY-POS','100px'));
+	f_html = f_html.toString().replace('[X-POS]', GM_getValue('fX-POS','5px'));
+	f_html = f_html.toString().replace('fTimeReplace', GM_getValue('fTime',8));
+	f_html = f_html.toString().replace('fRTimeReplace', GM_getValue('fRTime',4));
+	f_html = f_html.toString().replace('fRepairReplace', GM_getValue('fRepair','Checked'));
+	f_html = f_html.toString().replace('fCheckReplace', GM_getValue('fCheck','Checked'));
+	f_html = f_html.toString().replace('fCargoReplace', GM_getValue('fCargo',''));
+	f_html = f_html.toString().replace('fCateringReplace', GM_getValue('fCatering',''));
+	f_html = f_html.toString().replace('fCAmountReplace', GM_getValue('fCAmount',55000));
+	f_html = f_html.toString().replace('fFuelReplace', GM_getValue('fFuel',''));
+	f_html = f_html.toString().replace('fFuelRescueReplace', GM_getValue('fFuelRescue',''));
+	f_html = f_html.toString().replace('fFCostReplace', GM_getValue('fFCost',400));
+	f_html = f_html.toString().replace('fFuelFillReplace', GM_getValue('fFuelFill',''));
+	f_html = f_html.toString().replace('fFAmountReplace', GM_getValue('fFAmount',1000000));
+	f_html = f_html.toString().replace('fNoteReplace', GM_getValue('fNote','Use this area to save notes'));
     
-	f_html = f_html.toString().replace('lCatering' + lCatering + 'Selected', 'selected="yes"');
+	f_html = f_html.toString().replace('lCatering' + GM_getValue('lCatering',7) + 'Selected', 'selected="yes"');
 	f_html = f_html.toString().replace(/lCatering.?Selected/g, '');
 
-	f_html = f_html.toString().replace('fAdsReplace', fAds);
-	f_html = f_html.toString().replace('fACostReplace', fACost);
-	f_html = f_html.toString().replace('lAds' + lAds + 'Selected', 'selected="yes"');
+	f_html = f_html.toString().replace('fAdsReplace', GM_getValue('fAds',''));
+	f_html = f_html.toString().replace('fACostReplace', GM_getValue('fACost',7500));
+	f_html = f_html.toString().replace('lAds' + GM_getValue('lAds',9) + 'Selected', 'selected="yes"');
 	f_html = f_html.toString().replace(/lAds.?Selected/g, '');
-	f_html = f_html.toString().replace('lADay' + lADays + 'Selected', 'selected="yes"');
+	f_html = f_html.toString().replace('lADay' + GM_getValue('lADays',7) + 'Selected', 'selected="yes"');
 	f_html = f_html.toString().replace(/lADay.?Selected/g, '');
 
 	var fdiv = document.createElement("div");
 	fdiv.innerHTML = f_html;
 	fFB.appendChild(fdiv);
 
+	document.getElementById('fTbl1').addEventListener('mousedown',moveMe,true);
 	document.getElementById('Autopilot').addEventListener('click',enableAutoPilot,false);
 	document.getElementById('f_timefreq').addEventListener('change',fSettings,false);
 	document.getElementById('f_randtime').addEventListener('change',fSettings,false);
