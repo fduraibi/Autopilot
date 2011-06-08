@@ -11,6 +11,20 @@ install/add this script to GreaseMonkey, now when you open the AirlineManager ga
 start and the control box will show at the top left of the page.
 
 Change log:
+1.2.7:
+
+    * Added Cargo flights.
+    * Script tested and works under Google Chrome using “tampermonkey” extension.
+    * Fixed some compatibility with Google Chrome.
+    * Small fix to allow running on secure Facebook page (https).
+    * Increasing the delay and random delay between tasks, to help people with slow connections and make the script a bit harder to detect.
+
+1.2.6:
+
+    * Server update check of the script is back.
+    * Added Tooltips to explain the functionality of the controlbox.
+    * Enhanced fly function (if there are more than 10 aircraft waiting it will fly them in the same run).
+    * Small changes and fixes here and there.
 
 1.2.5:
     * Fix to the fly link (by Olla)
