@@ -11,6 +11,19 @@ install/add this script to GreaseMonkey, now when you open the AirlineManager ga
 start and the control box will show at the top left of the page.
 
 Change log:
+1.2.9: (June/10/2011)
+
+    * New: Titlebar for the controlbox which is used to move it.
+    * Update: Coloring the box to make it look nicer.
+
+1.2.8: (Jun/8/2011)
+
+    * New: Fuel Rescue option, if fuel tank is empty the script will buy enough fuel to fly the aircraft, no matter what the price is.
+    * New: Autopilot Controlbox is movable, and the position will be saved.
+    * Fix: Pages fetched will use the same protocol as the main page (http or https).
+    * Update: If for unknow reasons a page won't load, the script will reload AM
+    * Removed some unused code.
+
 1.2.7:
 
     * Added Cargo flights.

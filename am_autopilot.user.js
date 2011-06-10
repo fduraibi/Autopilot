@@ -15,7 +15,7 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.8
+// @version    1.2.9
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
 // @ThanksTo    Olla, Luke, [All of you users and commenters]
@@ -60,8 +60,8 @@ function moveMe(event){
     divObj.Left  = parseInt(divObj.DIV.style.left) - event.pageX;
     divObj.Top   = parseInt(divObj.DIV.style.top) - event.pageY;
 
-    document.getElementById('fTbl1').addEventListener("mousemove", moveStart, true);
-    document.getElementById('fTbl1').addEventListener("mouseup", moveStop, false);
+    document.getElementById('fTitleBar').addEventListener("mousemove", moveStart, true);
+    document.getElementById('fTitleBar').addEventListener("mouseup", moveStop, false);
 }
 
 function moveStart(event){
@@ -70,8 +70,8 @@ function moveStart(event){
 }
 
 function moveStop(){
-    document.getElementById('fTbl1').removeEventListener("mousemove", moveStart, true);
-    document.getElementById('fTbl1').removeEventListener("mouseup", moveStop, false);
+    document.getElementById('fTitleBar').removeEventListener("mousemove", moveStart, true);
+    document.getElementById('fTitleBar').removeEventListener("mouseup", moveStop, false);
     GM_setValue('fX-POS', divObj.DIV.style.left);
     GM_setValue('fY-POS', divObj.DIV.style.top);
 }
@@ -1009,18 +1009,19 @@ function addControls(){
 	GM_setValue('fProg','');
 
 	var f_html = <><![CDATA[
-	<div id="fAMAP" style="position: absolute; top: [Y-POS]; left: [X-POS]; z-index: 100; background: none repeat scroll 0% 0% rgb(255, 255, 255); border-style: dotted; border-width: 2px;">
-	<table id="fTbl1" border="0" style="border-bottom-style : dotted; border-bottom-width : 2px;"><tbody><tr>
+	<div id="fAMAP" style="position: absolute; top: [Y-POS]; left: [X-POS]; z-index: 100; background: none repeat scroll 0% 0% #3B5DA1; border-color:#9DAAB8; border-style: solid; border-width: 1px;">
+	<table bgcolor=#EBEBFF border="0" cellpadding="2" cellspacing="0" style=" border-color:#9DAAB8; border-bottom-style: solid; border-bottom-width: 1px; border-top-style: solid; border-top-width: 1px;">
+	<caption id="fTitleBar" title="Click on me to move the box"><font color="white">Airline Manager Autopilot</font></caption><tr>
 	<td><input title="Start or Stop the script" type="button" id="Autopilot" value="Autopilot"></td>
-	<td style="border-left-style : dotted; border-left-width : 2px;"><input title="Time to wait between each run" type="text" name="f_timefreq" value=fTimeReplace size="1px" maxlength="2" id="f_timefreq" style="text-align : center;">min +</td>
+	<td style="border-left-style : solid; border-left-width : 1px; border-color:#9DAAB8;"><input title="Time to wait between each run" type="text" name="f_timefreq" value=fTimeReplace size="1px" maxlength="2" id="f_timefreq" style="text-align : center;">min +</td>
 	<td colspan=2>Random<input title="A random value (between 0 & what you set) added to the wait time." type="text" name="f_randtime" value=fRTimeReplace size="1px" maxlength="2" id="f_randtime" style="text-align : center;" alt="Random Time"></td></tr>
 	<tr><td title="Status of the script (or count down to when it will run next)" id="f_timer" bgcolor="#ff0000" style="text-align : center;">Stopped</td>
-	<td style="border-left-style : dotted; border-left-width : 2px;"><input title="Enable doing c-check on aircraft before flying them" type="checkbox" name="fCheck" fCheckReplace id="fCheck" style="margin-top : 0px;">C-Check</td>
+	<td style="border-left-style : solid; border-left-width : 1px; border-color:#9DAAB8;"><input title="Enable doing c-check on aircraft before flying them" type="checkbox" name="fCheck" fCheckReplace id="fCheck" style="margin-top : 0px;">C-Check</td>
 	<td><input title="Enable repairing aircraft before flying them" type="checkbox" name="fRepair" fRepairReplace id="fRepair" style="margin-top : 0px;">Repair</td>
 	<td><input title="Enable flying Cargo aircraft (* only if you have them)" type="checkbox" name="fCargo" fCargoReplace id="fCargo" style="margin-top : 0px;">Fly Cargo</td>
 	</tr>
-	</tbody></table>
-	<table id="fTbl2" border="0" style="width: 100%;"><tbody><tr>
+	</table>
+	<table bgcolor=#EBEBFF border="0" cellpadding="2" cellspacing="0" style="width: 100%;"><tr>
 	<td><a title="Open the Note box" href="javascript:;//Open Note" onmousedown='if(document.getElementById("dNote").style.display == "none"){ document.getElementById("dNote").style.display = "table-row"; }else{ document.getElementById("dNote").style.display = "none"; }'>[+]</a>&nbsp;
 	<a title="Open the Catering Settings" href="javascript:;//Open Catering" onmousedown='if(document.getElementById("dCatering").style.display == "none"){ document.getElementById("dCatering").style.display = "table-row"; }else{ document.getElementById("dCatering").style.display = "none"; }'>[C]</a>&nbsp;
 	<a title="Open the Fuel Settings" href="javascript:;//Open Fuel" onmousedown='if(document.getElementById("dFuel").style.display == "none"){ document.getElementById("dFuel").style.display = "table-row"; }else{ document.getElementById("dFuel").style.display = "none"; }'>[F]</a>&nbsp;
@@ -1029,20 +1030,20 @@ function addControls(){
 	<a title="Visit the script website" href="http://fadvisor.net/blog/2010/03/auto-pilot/">@</a></td><td  id="f_status" style="color: red;"></td>
 	</tr>
 	<tr id="dCatering" style="display:none">
-	<td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;"><input title="Enable buying catering before flying the aircraft (will only buy if you don't have any)" type="checkbox" name="fCatering" fCateringReplace id="fCatering" style="margin-top : 0px;">Catering<br>
+	<td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;"><input title="Enable buying catering before flying the aircraft (will only buy if you don't have any)" type="checkbox" name="fCatering" fCateringReplace id="fCatering" style="margin-top : 0px;">Catering<br>
 	<select title="Select the type of catering you like to buy" id="lCatering"><option value="7" lCatering7Selected>7- Sky+</option><option value="6" lCatering6Selected>6- Sky Catering</option><option value="5" lCatering5Selected>5- Sky Burgers</option>
 	<option value="4" lCatering4Selected>4- Fast Food</option><option value="3" lCatering3Selected>3- Sky Fish</option><option value="2" lCatering2Selected>2- Cloud Chefs</option><option value="1" lCatering1Selected>1- AM Catering</option></select>
 	Amount<input title="Set the amount of catering to buy (you should follow the min & max values set by the game)" type="text" name="fCAmount" value=fCAmountReplace size="4px" maxlength="5" id="fCAmount" style="text-align : center;"></td>
 	</tr>
 	<tr id="dFuel" style="display:none">
-	<td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;"><input title="Enable buying fuel" type="checkbox" name="fFuel" fFuelReplace id="fFuel" style="margin-top : 0px;">Fuel&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+	<td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;"><input title="Enable buying fuel" type="checkbox" name="fFuel" fFuelReplace id="fFuel" style="margin-top : 0px;">Fuel&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
 	If price is or below <input title="The maximum price that you would like to pay for fuel, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price)" type="text" name="fFCost" value=fFCostReplace size="4px" maxlength="4" id="fFCost" style="text-align : center;"><br>
 	fill tank<input title="Check this box if you want the script to fill the tank to the maximum when the price is what you want" type="checkbox" name="fFuelFill" fFuelFillReplace id="fFuelFill" style="margin-top : 0px;">
 	or fill up to <input title="The desired amount of fuel that you want to have in your tank" type="text" name="fFAmount" value=fFAmountReplace size="9px" maxlength="9" id="fFAmount" style="text-align : center;"><br>
 	<input title="If the tank is empty then buy enough fuel to fly the aircraft even if it is expensive" type="checkbox" name="fFuelRescue" fFuelRescueReplace id="fFuelRescue" style="margin-top : 0px;">Fuel Rescue</td>
 	</tr>
 	<tr id="dAds" style="display:none">
-	<td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;">
+	<td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;">
 	<input title="Enable buying ads" type="checkbox" name="fAds" fAdsReplace id="fAds" style="margin-top : 0px;" DISABLED>Ads
 	|  If price is or below <input title="The maximum price that you would like to pay for ads, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price)" type="text" name="fACost" value=fACostReplace size="5px" maxlength="5" id="fACost" style="text-align : center;">
 	<a title="See the price prediction at this link" href="http://fadvisor.net/blog/2010/06/airlinemanager-ads-prices/"> @</a>
@@ -1071,15 +1072,15 @@ function addControls(){
 	</td>
 	</tr>
 	<tr id="dBuySell" style="display:none">
-	<td colspan="2" align="center" style="border-top-style:dotted; border-top-width:2px;">
+	<td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;">
 	Reserved for Buying and Selling aircraft
 	<br>
 	* To be implemented *
 	</td>
 	</tr>
 	<tr id="dNote" style="display:none">
-	<td colspan="2" style="border-top-style:dotted; border-top-width:2px;"><textarea rows="4" style="width: 97%;" id="fNote">fNoteReplace</textarea></td>
-	</tr></tbody></table>
+	<td colspan="2" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;"><textarea rows="4" style="width: 97%;" id="fNote">fNoteReplace</textarea></td>
+	</tr></table>
 	</div>
 	]]></>;
 
@@ -1113,7 +1114,7 @@ function addControls(){
 	fdiv.innerHTML = f_html;
 	fFB.appendChild(fdiv);
 
-	document.getElementById('fTbl1').addEventListener('mousedown',moveMe,true);
+	document.getElementById('fTitleBar').addEventListener('mousedown',moveMe,true);
 	document.getElementById('Autopilot').addEventListener('click',enableAutoPilot,false);
 	document.getElementById('f_timefreq').addEventListener('change',fSettings,false);
 	document.getElementById('f_randtime').addEventListener('change',fSettings,false);
