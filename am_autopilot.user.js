@@ -15,7 +15,7 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.9
+// @version    1.2.10a
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
 // @ThanksTo    Olla, Luke, [All of you users and commenters]
@@ -32,6 +32,7 @@ var fSL=0;    // Global variable used for the number of rounds the script should
 var fML=0;    // Global variable that keep count of how many times the we ran the script after the AM page was loaded. (this is to solve a bug in AM) so after a number of rounds it will just refresh and reload the AM page.
 var FBSession;    // Stores the Facebook settion identifier for the user which AM uses when calling its own links to know the FB user.
 var fFuelTankMax=999999999; // Maximum amount of fuel a normal tank can have (that could change by AM)
+var fLuckyFuelPrice=50;
 
 function fRand(value){    // Generates a random number between 1 and value (we use it mainly to add a random seconds while calling the AM funstions
     return Math.floor(Math.random() * (value+1));
@@ -718,8 +719,14 @@ function f_Fuel(){
 			var Price = str.substring(loc2 + SearchPrice.length, loc2len).replace(/[^0-9]/g, '');
 			GM_log('Fuel cost is ' + Price);
 
-			if( Price <= GM_getValue('fFCost')){
-			    if(GM_getValue('fFuelFill') === 'Checked'){
+			if( GM_getValue('fFuelLuck') === 'Checked' && Price <= fLuckyFuelPrice){
+			    fAmnt = fFuelTankMax - Tank;
+			    GM_log('I feel lucky today :)   Fuel needed = ' + fAmnt);
+			    if( fAmnt > 0 ){
+			    BuyFuel(fAmnt);
+			    }   
+			} else if( Price <= GM_getValue('fFCost')){
+			    if((GM_getValue('fFuelFill') === 'Checked')){
 				fAmnt = fFuelTankMax - Tank;
 			    }else{
 				fAmnt = GM_getValue('fFAmount',1000000) - Tank;
@@ -737,7 +744,6 @@ function f_Fuel(){
 				BuyFuel(fAmnt);
 			    }
 			}
-
 		    }else{
 			GM_log('Price not found!! :(');
 		    }
@@ -971,6 +977,12 @@ function fSettings(){    // Store the script settings under Firefox
 	GM_setValue('fFuelRescue', '');
     }
     
+    if(document.getElementById('fFuelLuck').checked === true){
+	GM_setValue('fFuelLuck', 'Checked');
+    } else{
+	GM_setValue('fFuelLuck', '');
+    }
+    
     if(document.getElementById('fFuel').checked === true){
 	GM_setValue('fFuel', 'Checked');
     } else{
@@ -991,7 +1003,8 @@ function fSettings(){    // Store the script settings under Firefox
     
     if(document.getElementById('fCargo').checked === true){
 	GM_setValue('fCargo', 'Checked');
-    } else{
+    }
+    else{
 	GM_setValue('fCargo', '');
     }
 }
@@ -1009,7 +1022,7 @@ function addControls(){
 	GM_setValue('fProg','');
 
 	var f_html = <><![CDATA[
-	<div id="fAMAP" style="position: absolute; top: [Y-POS]; left: [X-POS]; z-index: 100; background: none repeat scroll 0% 0% #3B5DA1; border-color:#9DAAB8; border-style: solid; border-width: 1px;">
+	<div id="fAMAP" style="position: absolute; top: [Y-POS]; left: [X-POS]; z-index: 3; background: none repeat scroll 0% 0% #3B5DA1; border-color:#9DAAB8; border-style: solid; border-width: 1px;">
 	<table bgcolor=#EBEBFF border="0" cellpadding="2" cellspacing="0" style=" border-color:#9DAAB8; border-bottom-style: solid; border-bottom-width: 1px; border-top-style: solid; border-top-width: 1px;">
 	<caption id="fTitleBar" title="Click on me to move the box"><font color="white">Airline Manager Autopilot</font></caption><tr>
 	<td><input title="Start or Stop the script" type="button" id="Autopilot" value="Autopilot"></td>
@@ -1030,7 +1043,7 @@ function addControls(){
 	<a title="Visit the script website" href="http://fadvisor.net/blog/2010/03/auto-pilot/">@</a></td><td  id="f_status" style="color: red;"></td>
 	</tr>
 	<tr id="dCatering" style="display:none">
-	<td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;"><input title="Enable buying catering before flying the aircraft (will only buy if you don't have any)" type="checkbox" name="fCatering" fCateringReplace id="fCatering" style="margin-top : 0px;">Catering<br>
+	<td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;"><input title="Enable buying catering before flying the aircraft (will only buy if you don't have any)" type="checkbox" name="fCatering" fCateringReplace id="fCatering" style="margin-top : 0px;">Catering
 	<select title="Select the type of catering you like to buy" id="lCatering"><option value="7" lCatering7Selected>7- Sky+</option><option value="6" lCatering6Selected>6- Sky Catering</option><option value="5" lCatering5Selected>5- Sky Burgers</option>
 	<option value="4" lCatering4Selected>4- Fast Food</option><option value="3" lCatering3Selected>3- Sky Fish</option><option value="2" lCatering2Selected>2- Cloud Chefs</option><option value="1" lCatering1Selected>1- AM Catering</option></select>
 	Amount<input title="Set the amount of catering to buy (you should follow the min & max values set by the game)" type="text" name="fCAmount" value=fCAmountReplace size="4px" maxlength="5" id="fCAmount" style="text-align : center;"></td>
@@ -1040,7 +1053,8 @@ function addControls(){
 	If price is or below <input title="The maximum price that you would like to pay for fuel, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price)" type="text" name="fFCost" value=fFCostReplace size="4px" maxlength="4" id="fFCost" style="text-align : center;"><br>
 	fill tank<input title="Check this box if you want the script to fill the tank to the maximum when the price is what you want" type="checkbox" name="fFuelFill" fFuelFillReplace id="fFuelFill" style="margin-top : 0px;">
 	or fill up to <input title="The desired amount of fuel that you want to have in your tank" type="text" name="fFAmount" value=fFAmountReplace size="9px" maxlength="9" id="fFAmount" style="text-align : center;"><br>
-	<input title="If the tank is empty then buy enough fuel to fly the aircraft even if it is expensive" type="checkbox" name="fFuelRescue" fFuelRescueReplace id="fFuelRescue" style="margin-top : 0px;">Fuel Rescue</td>
+	<input title="If the tank is empty then buy enough fuel to fly the aircraft even if it is expensive" type="checkbox" name="fFuelRescue" fFuelRescueReplace id="fFuelRescue" style="margin-top : 0px;">Fuel Rescue
+	<input title="When the fuel price drops to fLuckyFuelPriceReplace or below fill the tank" type="checkbox" name="fFuelLuck" fFuelLuckReplace id="fFuelLuck" style="margin-top : 0px;">Lucky Fuel</td>
 	</tr>
 	<tr id="dAds" style="display:none">
 	<td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;">
@@ -1095,6 +1109,8 @@ function addControls(){
 	f_html = f_html.toString().replace('fCAmountReplace', GM_getValue('fCAmount',55000));
 	f_html = f_html.toString().replace('fFuelReplace', GM_getValue('fFuel',''));
 	f_html = f_html.toString().replace('fFuelRescueReplace', GM_getValue('fFuelRescue',''));
+	f_html = f_html.toString().replace('fFuelLuckReplace', GM_getValue('fFuelLuck',''));
+	f_html = f_html.toString().replace('fLuckyFuelPriceReplace', fLuckyFuelPrice);
 	f_html = f_html.toString().replace('fFCostReplace', GM_getValue('fFCost',400));
 	f_html = f_html.toString().replace('fFuelFillReplace', GM_getValue('fFuelFill',''));
 	f_html = f_html.toString().replace('fFAmountReplace', GM_getValue('fFAmount',1000000));
@@ -1127,6 +1143,7 @@ function addControls(){
 	document.getElementById('fFuel').addEventListener('change',fSettings,false);
 	document.getElementById('fFuelFill').addEventListener('change',fSettings,false);
 	document.getElementById('fFuelRescue').addEventListener('change',fSettings,false);
+	document.getElementById('fFuelLuck').addEventListener('change',fSettings,false);
 	document.getElementById('fFCost').addEventListener('change',fSettings,false)
 	document.getElementById('fFAmount').addEventListener('change',fFuelASettings,false);
 	document.getElementById('fNote').addEventListener('change',fSettings,false);
@@ -1149,3 +1166,16 @@ function addControls(){
     }
 }
 window.setTimeout(addControls, fDelay);
+
+
+/*------------ To Do list --------------
+
+- Settings box for the script (maybe a sliding setting box)
+    - Delay time + Random delay set.
+    - The script will default to Start or Stop when loading.
+    - When finished with a running round stay at Flight page/Cargo or go to the main page
+- Ads
+- Selling & buying aircraft
+
+
+*/
