@@ -15,15 +15,15 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.10a
+// @version    1.2.10b
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
 // @ThanksTo    Olla, Luke, [All of you users and commenters]
 // ==/UserScript==
 ]]></>;
 
-var fDelay=5000;    // A delay value after opening or doing an action (to give the browser sometime to load tha page), this time is in milliseconds, each 1000 milliseconds = 1 second
-var fRandomDelayMax=4000;
+var fDelay;    // A delay value after opening or doing an action (to give the browser sometime to load tha page), this time is in milliseconds, each 1000 milliseconds = 1 second
+var fRndDelay;
 
 var fmin=0;    // Global variable for the minutes of the counter
 var fsec;    // Global variable for the seconds of the counter
@@ -134,7 +134,7 @@ function fCheck4Update(){
 //    if (d_route === null && fSL < 20){
 //    GM_log('Ads-wait');
 //    fSL++;
-//    window.setTimeout(f_Ads, fDelay+fRand(fRandomDelayMax));
+//    window.setTimeout(f_Ads, fDelay+fRand(fRndDelay));
 //    } else{
 //
 //    var i_List = d_route.getElementsByTagName('input');
@@ -177,7 +177,7 @@ function fCheck4Update(){
 //        location.assign( 'javascript:' + att + ';void(0)' );
 //        GM_log('Found Ads, open it..');
 //        fSL=0;
-//        window.setTimeout(f_Ads, fDelay+fRand(fRandomDelayMax));
+//        window.setTimeout(f_Ads, fDelay+fRand(fRndDelay));
 //        fL = true;
 //        break;
 //    }
@@ -185,7 +185,7 @@ function fCheck4Update(){
 //    if (fL === false && fSL < 20){
 //    GM_log('Ads not found yet...');
 //    fSL++;
-//    window.setTimeout(f_openAds, fDelay+fRand(fRandomDelayMax));
+//    window.setTimeout(f_openAds, fDelay+fRand(fRndDelay));
 //    }
 //}
 
@@ -267,7 +267,7 @@ function f_Cargo(){
     if (d_fly === null && fSL < 20){
 	GM_log('Cargo-wait');
 	fSL++;
-	window.setTimeout(f_Cargo, fDelay+fRand(fRandomDelayMax));
+	window.setTimeout(f_Cargo, fDelay+fRand(fRndDelay));
     } else if ( fSL >= 20 ){
 	reLoadMe('');
     } else{
@@ -279,7 +279,7 @@ function f_Cargo(){
 
 	if (a_List.length === 1){
 	    GM_log('Cargo a_list is 1!!! try again');
-	    window.setTimeout(f_Fly, fDelay+fRand(fRandomDelayMax));
+	    window.setTimeout(f_Fly, fDelay+fRand(fRndDelay));
 	} else {
 
 	    var f_Count = 0;
@@ -317,7 +317,7 @@ function f_Cargo(){
 	    if (f_Count > 10){
 		GM_log('More cargo routes to fly....');
 		GM_setValue('fProg','Cargo');
-		window.setTimeout(f_openCargo, fDelay+fRand(fRandomDelayMax));
+		window.setTimeout(f_openCargo, fDelay+fRand(fRndDelay));
 	    }
 	    else{
 		GM_log('Cargo-done.. see you later');
@@ -337,7 +337,7 @@ function f_openCargo(){
 	    location.assign( 'javascript:' + att + ';void(0)' );
 	    GM_log('Found Cargo, open it..');
 	    fSL=0;
-	    window.setTimeout(f_Cargo, fDelay+fRand(fRandomDelayMax));
+	    window.setTimeout(f_Cargo, fDelay+fRand(fRndDelay));
 	    fL = true;
 	    break;
 	}
@@ -345,7 +345,7 @@ function f_openCargo(){
     if (fL === false && fSL < 20){
 	GM_log('Cargo not found yet...');
 	fSL++;
-	window.setTimeout(f_openCargo, fDelay+fRand(fRandomDelayMax));
+	window.setTimeout(f_openCargo, fDelay+fRand(fRndDelay));
     }
     else if ( fSL >= 20 )
 	reLoadMe('');
@@ -356,7 +356,7 @@ function f_Fly(){
     if (d_fly === null && fSL < 20){
 	GM_log('F-wait');
 	fSL++;
-	window.setTimeout(f_Fly, fDelay+fRand(fRandomDelayMax));
+	window.setTimeout(f_Fly, fDelay+fRand(fRndDelay));
     } else if ( fSL >= 20 ){
 	reLoadMe('');
     } else{
@@ -368,7 +368,7 @@ function f_Fly(){
 
 	if (a_List.length === 1){
 	    GM_log('a_list is 1!!! try again');
-	    window.setTimeout(f_Fly, fDelay+fRand(fRandomDelayMax));
+	    window.setTimeout(f_Fly, fDelay+fRand(fRndDelay));
 	} else {
 
 	    var f_Count = 0;
@@ -406,13 +406,13 @@ function f_Fly(){
 	    if (f_Count > 10){
 		GM_log('More routes to fly....');
 		GM_setValue('fProg','Fly');
-		window.setTimeout(f_openFlight, fDelay+fRand(fRandomDelayMax));
+		window.setTimeout(f_openFlight, fDelay+fRand(fRndDelay));
 	    }
 	    else{
 		if(GM_getValue('fCargo','') === 'Checked'){
 		    GM_log('F-to-Cargo');
 		    GM_setValue('fProg','Cargo');
-		    window.setTimeout(f_openCargo, fDelay+fRand(fRandomDelayMax));
+		    window.setTimeout(f_openCargo, fDelay+fRand(fRndDelay));
 		} else{
 		    GM_log('F-done.. see you later');
 		    GM_setValue('fProg','');
@@ -432,7 +432,7 @@ function f_openFlight(){
 	    location.assign( 'javascript:' + att + ';void(0)' );
 	    GM_log('Found F, open it..');
 	    fSL=0;
-	    window.setTimeout(f_Fly, fDelay+fRand(fRandomDelayMax));
+	    window.setTimeout(f_Fly, fDelay+fRand(fRndDelay));
 	    //            window.setTimeout(f_FlyWithNoFuel, fDelay+fRand(1000));
 	    fL = true;
 	    break;
@@ -441,7 +441,7 @@ function f_openFlight(){
     if (fL === false && fSL < 20){
 	GM_log('F not found yet...');
 	fSL++;
-	window.setTimeout(f_openFlight, fDelay+fRand(fRandomDelayMax));
+	window.setTimeout(f_openFlight, fDelay+fRand(fRndDelay));
     }
     else if ( fSL >= 20 )
 	reLoadMe('');
@@ -453,7 +453,7 @@ function f_Repair(){
     if (d_allc === null && fSL < 20){
 	GM_log('R-wait');
 	fSL++;
-	window.setTimeout(f_Repair, fDelay+fRand(fRandomDelayMax));
+	window.setTimeout(f_Repair, fDelay+fRand(fRndDelay));
     } else if ( fSL >= 20 )
 	reLoadMe('');
     else{
@@ -494,7 +494,7 @@ function f_Repair(){
         
 	GM_log('R-time to fly');
 	GM_setValue('fProg','Fly');
-	window.setTimeout(f_openFlight, fDelay+fRand(fRandomDelayMax));
+	window.setTimeout(f_openFlight, fDelay+fRand(fRndDelay));
     }
 }
 
@@ -508,7 +508,7 @@ function f_openRepair(){
 	    location.assign( 'javascript:' + att + ';void(0)' );
 	    GM_log('Found R, open it..');
 	    fSL=0;
-	    window.setTimeout(f_Repair, fDelay+fRand(fRandomDelayMax));
+	    window.setTimeout(f_Repair, fDelay+fRand(fRndDelay));
 	    fL = true;
 	    break;
 	}
@@ -516,7 +516,7 @@ function f_openRepair(){
     if (fL === false && fSL < 20){
 	GM_log('R not found yet... l=' + location.href);
 	fSL++;
-	window.setTimeout(f_openRepair, fDelay+fRand(fRandomDelayMax));
+	window.setTimeout(f_openRepair, fDelay+fRand(fRndDelay));
     } else if ( fSL >= 20 )
 	reLoadMe('');
 }
@@ -527,7 +527,7 @@ function f_CCheck(){
     if (d_allc === null && fSL < 20){
 	GM_log('C-wait');
 	fSL++;
-	window.setTimeout(f_CCheck, fDelay+fRand(fRandomDelayMax));
+	window.setTimeout(f_CCheck, fDelay+fRand(fRndDelay));
     } else if ( fSL >= 20 )
 	reLoadMe('');
     else{
@@ -569,11 +569,11 @@ function f_CCheck(){
 	if(GM_getValue('fRepair','Checked') === 'Checked'){
 	    GM_log('C-call-to-Repair');
 	    GM_setValue('fProg','Repair');
-	    window.setTimeout(f_openRepair, fDelay+fRand(fRandomDelayMax));
+	    window.setTimeout(f_openRepair, fDelay+fRand(fRndDelay));
 	} else{
 	    GM_log('C-call-to-Fly');
 	    GM_setValue('fProg','Fly');
-	    window.setTimeout(f_openFlight, fDelay+fRand(fRandomDelayMax));
+	    window.setTimeout(f_openFlight, fDelay+fRand(fRndDelay));
 	}
     }
 }
@@ -588,7 +588,7 @@ function f_openCCheck(){
 	    location.assign( 'javascript:' + att + ';void(0)' );
 	    GM_log('Found C, open it');
 	    fSL=0
-	    window.setTimeout(f_CCheck, fDelay+fRand(fRandomDelayMax));
+	    window.setTimeout(f_CCheck, fDelay+fRand(fRndDelay));
 	    fL = true;
 	    break;
 	}
@@ -596,7 +596,7 @@ function f_openCCheck(){
     if (fL === false && fSL < 20){
 	GM_log('C not found yet...');
 	fSL++;
-	window.setTimeout(f_openCCheck, fDelay+fRand(fRandomDelayMax));
+	window.setTimeout(f_openCCheck, fDelay+fRand(fRndDelay));
     } else if ( fSL >= 20 )
 	reLoadMe('');
 }
@@ -803,6 +803,9 @@ function fPoller(){
     if(GM_getValue('fRun') === 'true'){
 	GM_setValue('fRun','false');
 	GM_log('Start');
+	
+	fDelay = GM_getValue('fDelay','4') * 1000;	    //load the delay value and converts it into milliseconds
+	fRndDelay = GM_getValue('fRndDelay','5') * 1000;
 
 	GetFBSession();
 
@@ -835,11 +838,11 @@ function fPoller(){
 	if(GM_getValue('fProg') === 'Repair'){
 	    GM_setValue('fProg','DoRepair');
 	    GM_log('Do Repair');
-	    window.setTimeout(f_openRepair, fDelay+fRand(fRandomDelayMax));
+	    window.setTimeout(f_openRepair, fDelay+fRand(fRndDelay));
 	} else if(GM_getValue('fProg') === 'Fly'){
 	    GM_setValue('fProg','DoFly');
 	    GM_log('Do Fly');
-	    window.setTimeout(f_openFlight, fDelay+fRand(fRandomDelayMax));
+	    window.setTimeout(f_openFlight, fDelay+fRand(fRndDelay));
 	}
     }
     //    GM_log('polling.. ');
@@ -903,7 +906,7 @@ function enableAutoPilot(){
     if (f_LED === null && fSL < 20)
     {
 	fSL++;
-	window.setTimeout(enableAutoPilot, fDelay+fRand(fRandomDelayMax));
+	window.setTimeout(enableAutoPilot, fDelay+fRand(fRndDelay));
     } else{
 	fSL=0;
 	var f_Color = f_LED.getAttribute('bgcolor');
@@ -924,7 +927,11 @@ function enableAutoPilot(){
 function wasIrunning(){
     if(GM_getValue('fRun')==='resume'){
 	GM_log('i was running before..');
-	window.setTimeout(enableAutoPilot,fDelay+fRand(fRandomDelayMax))
+	window.setTimeout(enableAutoPilot,fDelay+fRand(fRndDelay))
+    }
+    else if (document.getElementById('fAutoStart').checked === true){
+	GM_log('Auto starting...');
+	window.setTimeout(enableAutoPilot,fDelay+fRand(fRndDelay))
     }
 }
 
@@ -1007,6 +1014,15 @@ function fSettings(){    // Store the script settings under Firefox
     else{
 	GM_setValue('fCargo', '');
     }
+    
+    if(document.getElementById('fAutoStart').checked === true){
+	GM_setValue('fAutoStart', 'Checked');
+    } else{
+	GM_setValue('fAutoStart', '');
+    }
+    
+    GM_setValue('fDelay',parseInt(document.getElementById('fDelay').value));
+    GM_setValue('fRndDelay',parseInt(document.getElementById('fRndDelay').value));
 }
 
 function addControls(){
@@ -1035,13 +1051,19 @@ function addControls(){
 	</tr>
 	</table>
 	<table bgcolor=#EBEBFF border="0" cellpadding="2" cellspacing="0" style="width: 100%;"><tr>
-	<td><a title="Open the Note box" href="javascript:;//Open Note" onmousedown='if(document.getElementById("dNote").style.display == "none"){ document.getElementById("dNote").style.display = "table-row"; }else{ document.getElementById("dNote").style.display = "none"; }'>[+]</a>&nbsp;
+	<td><a title="Open the Options" href="javascript:;//Open Options" onmousedown='if(document.getElementById("dOptions").style.display == "none"){ document.getElementById("dOptions").style.display = "table-row"; }else{ document.getElementById("dOptions").style.display = "none"; }'>[O]</a>&nbsp;
+	<a title="Open the Note box" href="javascript:;//Open Note" onmousedown='if(document.getElementById("dNote").style.display == "none"){ document.getElementById("dNote").style.display = "table-row"; }else{ document.getElementById("dNote").style.display = "none"; }'>[+]</a>&nbsp;
 	<a title="Open the Catering Settings" href="javascript:;//Open Catering" onmousedown='if(document.getElementById("dCatering").style.display == "none"){ document.getElementById("dCatering").style.display = "table-row"; }else{ document.getElementById("dCatering").style.display = "none"; }'>[C]</a>&nbsp;
 	<a title="Open the Fuel Settings" href="javascript:;//Open Fuel" onmousedown='if(document.getElementById("dFuel").style.display == "none"){ document.getElementById("dFuel").style.display = "table-row"; }else{ document.getElementById("dFuel").style.display = "none"; }'>[F]</a>&nbsp;
 	<a title="* To be implemented * Open the Advertising Settings" href="javascript:;//Open Ads" onmousedown='if(document.getElementById("dAds").style.display == "none"){ document.getElementById("dAds").style.display = "table-row"; }else{ document.getElementById("dAds").style.display = "none"; }'>[A]</a>&nbsp;
 	<a title="* To be implemented * Open the Buy & Sell Aircraft Settings" href="javascript:;//Open Buy&Sell" onmousedown='if(document.getElementById("dBuySell").style.display == "none"){ document.getElementById("dBuySell").style.display = "table-row"; }else{ document.getElementById("dBuySell").style.display = "none"; }'>[$]</a>&nbsp;
 	<a title="Visit the script website" href="http://fadvisor.net/blog/2010/03/auto-pilot/">@</a></td><td  id="f_status" style="color: red;"></td>
 	</tr>
+	<tr id="dOptions" style="display:none"><td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;">
+	<input title="Start the script immediatly after loading the AM page" type="checkbox" name="fAutoStart" fAutoStartReplace id="fAutoStart" style="margin-top : 0px;">Auto Start on load<br>
+	Tasks Delay<input title="Set the amount of delay between tasks [in seconds] (if you don't know what this means then don't change it)" type="text" name="fDelay" value=fDelayReplace size="2px" maxlength="2" id="fDelay" style="text-align : center;">
+	Tasks Random Delay<input title="Set the maximum random value added to the delay [in seconds] (if you don't know what this means then don't change it)" type="text" name="fRndDelay" value=fRndDelayReplace size="2px" maxlength="2" id="fRndDelay" style="text-align : center;">
+	</td></tr>
 	<tr id="dCatering" style="display:none">
 	<td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;"><input title="Enable buying catering before flying the aircraft (will only buy if you don't have any)" type="checkbox" name="fCatering" fCateringReplace id="fCatering" style="margin-top : 0px;">Catering
 	<select title="Select the type of catering you like to buy" id="lCatering"><option value="7" lCatering7Selected>7- Sky+</option><option value="6" lCatering6Selected>6- Sky Catering</option><option value="5" lCatering5Selected>5- Sky Burgers</option>
@@ -1105,6 +1127,9 @@ function addControls(){
 	f_html = f_html.toString().replace('fRepairReplace', GM_getValue('fRepair','Checked'));
 	f_html = f_html.toString().replace('fCheckReplace', GM_getValue('fCheck','Checked'));
 	f_html = f_html.toString().replace('fCargoReplace', GM_getValue('fCargo',''));
+	f_html = f_html.toString().replace('fAutoStartReplace', GM_getValue('fAutoStart',''));
+	f_html = f_html.toString().replace('fDelayReplace', GM_getValue('fDelay','4'));
+	f_html = f_html.toString().replace('fRndDelayReplace', GM_getValue('fRndDelay','5'));
 	f_html = f_html.toString().replace('fCateringReplace', GM_getValue('fCatering',''));
 	f_html = f_html.toString().replace('fCAmountReplace', GM_getValue('fCAmount',55000));
 	f_html = f_html.toString().replace('fFuelReplace', GM_getValue('fFuel',''));
@@ -1115,10 +1140,8 @@ function addControls(){
 	f_html = f_html.toString().replace('fFuelFillReplace', GM_getValue('fFuelFill',''));
 	f_html = f_html.toString().replace('fFAmountReplace', GM_getValue('fFAmount',1000000));
 	f_html = f_html.toString().replace('fNoteReplace', GM_getValue('fNote','Use this area to save notes'));
-    
 	f_html = f_html.toString().replace('lCatering' + GM_getValue('lCatering',7) + 'Selected', 'selected="yes"');
 	f_html = f_html.toString().replace(/lCatering.?Selected/g, '');
-
 	f_html = f_html.toString().replace('fAdsReplace', GM_getValue('fAds',''));
 	f_html = f_html.toString().replace('fACostReplace', GM_getValue('fACost',7500));
 	f_html = f_html.toString().replace('lAds' + GM_getValue('lAds',9) + 'Selected', 'selected="yes"');
@@ -1137,6 +1160,9 @@ function addControls(){
 	document.getElementById('fRepair').addEventListener('change',fSettings,false);
 	document.getElementById('fCheck').addEventListener('change',fSettings,false);
 	document.getElementById('fCargo').addEventListener('change',fSettings,false);
+	document.getElementById('fAutoStart').addEventListener('change',fSettings,false);
+	document.getElementById('fDelay').addEventListener('change',fSettings,false);
+	document.getElementById('fRndDelay').addEventListener('change',fSettings,false);
 	document.getElementById('fCatering').addEventListener('change',fCSettings,false);
 	document.getElementById('lCatering').addEventListener('change',fCSettings,false);
 	document.getElementById('fCAmount').addEventListener('change',fCSettings,false);
@@ -1170,7 +1196,7 @@ window.setTimeout(addControls, fDelay);
 
 /*------------ To Do list --------------
 
-- Settings box for the script (maybe a sliding setting box)
+- Options box for the script (maybe a sliding box)
     - Delay time + Random delay set.
     - The script will default to Start or Stop when loading.
     - When finished with a running round stay at Flight page/Cargo or go to the main page
