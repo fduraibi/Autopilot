@@ -15,7 +15,7 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.10b
+// @version    1.2.10c
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
 // @ThanksTo    Olla, Luke, [All of you users and commenters]
@@ -1038,7 +1038,7 @@ function addControls(){
 	GM_setValue('fProg','');
 
 	var f_html = <><![CDATA[
-	<div id="fAMAP" style="position: absolute; top: [Y-POS]; left: [X-POS]; z-index: 3; background: none repeat scroll 0% 0% #3B5DA1; border-color:#9DAAB8; border-style: solid; border-width: 1px;">
+	<div id="fAMAP" style="position: absolute; top: [Y-POS]; left: [X-POS]; background: none repeat scroll 0% 0% #3B5DA1; border-color:#9DAAB8; border-style: solid; border-width: 1px;">
 	<table bgcolor=#EBEBFF border="0" cellpadding="2" cellspacing="0" style=" border-color:#9DAAB8; border-bottom-style: solid; border-bottom-width: 1px; border-top-style: solid; border-top-width: 1px;">
 	<caption id="fTitleBar" title="Click on me to move the box"><font color="white">Airline Manager Autopilot</font></caption><tr>
 	<td><input title="Start or Stop the script" type="button" id="Autopilot" value="Autopilot"></td>
@@ -1052,17 +1052,17 @@ function addControls(){
 	</table>
 	<table bgcolor=#EBEBFF border="0" cellpadding="2" cellspacing="0" style="width: 100%;"><tr>
 	<td><a title="Open the Options" href="javascript:;//Open Options" onmousedown='if(document.getElementById("dOptions").style.display == "none"){ document.getElementById("dOptions").style.display = "table-row"; }else{ document.getElementById("dOptions").style.display = "none"; }'>[O]</a>&nbsp;
-	<a title="Open the Note box" href="javascript:;//Open Note" onmousedown='if(document.getElementById("dNote").style.display == "none"){ document.getElementById("dNote").style.display = "table-row"; }else{ document.getElementById("dNote").style.display = "none"; }'>[+]</a>&nbsp;
 	<a title="Open the Catering Settings" href="javascript:;//Open Catering" onmousedown='if(document.getElementById("dCatering").style.display == "none"){ document.getElementById("dCatering").style.display = "table-row"; }else{ document.getElementById("dCatering").style.display = "none"; }'>[C]</a>&nbsp;
 	<a title="Open the Fuel Settings" href="javascript:;//Open Fuel" onmousedown='if(document.getElementById("dFuel").style.display == "none"){ document.getElementById("dFuel").style.display = "table-row"; }else{ document.getElementById("dFuel").style.display = "none"; }'>[F]</a>&nbsp;
 	<a title="* To be implemented * Open the Advertising Settings" href="javascript:;//Open Ads" onmousedown='if(document.getElementById("dAds").style.display == "none"){ document.getElementById("dAds").style.display = "table-row"; }else{ document.getElementById("dAds").style.display = "none"; }'>[A]</a>&nbsp;
 	<a title="* To be implemented * Open the Buy & Sell Aircraft Settings" href="javascript:;//Open Buy&Sell" onmousedown='if(document.getElementById("dBuySell").style.display == "none"){ document.getElementById("dBuySell").style.display = "table-row"; }else{ document.getElementById("dBuySell").style.display = "none"; }'>[$]</a>&nbsp;
-	<a title="Visit the script website" href="http://fadvisor.net/blog/2010/03/auto-pilot/">@</a></td><td  id="f_status" style="color: red;"></td>
-	</tr>
+	<a title="Open the Note box" href="javascript:;//Open Note" onmousedown='if(document.getElementById("dNote").style.display == "none"){ document.getElementById("dNote").style.display = "table-row"; }else{ document.getElementById("dNote").style.display = "none"; }'>[N]</a>&nbsp;
+	<a title="Visit the script website" href="http://fadvisor.net/blog/2010/03/auto-pilot/">@</a>
+	</td><td  id="f_status" style="color: red;"></td></tr>
 	<tr id="dOptions" style="display:none"><td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;">
 	<input title="Start the script immediatly after loading the AM page" type="checkbox" name="fAutoStart" fAutoStartReplace id="fAutoStart" style="margin-top : 0px;">Auto Start on load<br>
-	Tasks Delay<input title="Set the amount of delay between tasks [in seconds] (if you don't know what this means then don't change it)" type="text" name="fDelay" value=fDelayReplace size="2px" maxlength="2" id="fDelay" style="text-align : center;">
-	Tasks Random Delay<input title="Set the maximum random value added to the delay [in seconds] (if you don't know what this means then don't change it)" type="text" name="fRndDelay" value=fRndDelayReplace size="2px" maxlength="2" id="fRndDelay" style="text-align : center;">
+	Tasks Delay<input title="Set the amount of delay between tasks [in seconds] (if you don't know what this means then don't change it)" type="text" name="fDelay" value=fDelayReplace size="1px" maxlength="2" id="fDelay" style="text-align : center;">
+	Tasks Random Delay<input title="Set the maximum random value added to the delay [in seconds] (if you don't know what this means then don't change it)" type="text" name="fRndDelay" value=fRndDelayReplace size="1px" maxlength="2" id="fRndDelay" style="text-align : center;">
 	</td></tr>
 	<tr id="dCatering" style="display:none">
 	<td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;"><input title="Enable buying catering before flying the aircraft (will only buy if you don't have any)" type="checkbox" name="fCatering" fCateringReplace id="fCatering" style="margin-top : 0px;">Catering
@@ -1196,12 +1196,8 @@ window.setTimeout(addControls, fDelay);
 
 /*------------ To Do list --------------
 
-- Options box for the script (maybe a sliding box)
-    - Delay time + Random delay set.
-    - The script will default to Start or Stop when loading.
-    - When finished with a running round stay at Flight page/Cargo or go to the main page
 - Ads
 - Selling & buying aircraft
-
+- Update the flying routine to use the new Fly button instead of reloading the flight page every time.
 
 */
