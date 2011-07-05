@@ -11,13 +11,18 @@ install/add this script to GreaseMonkey, now when you open the AirlineManager ga
 start and the control box will show at the top left of the page.
 
 Change log:
-1.2.9: (June/10/2011)
+1.2.10: (July/04/2011)
+    * Enhanced fly function will not reload for every patch of aircraft.
+    * New: Lucky Fuel, when the fuel price drops to 50 (which happens once a month) fill the tank.
+    * New: Options box to tune the script as you like:
+	- Autostart on page load.
+	- Change the delay and random delay times.
 
+1.2.9: (June/10/2011)
     * New: Titlebar for the controlbox which is used to move it.
     * Update: Coloring the box to make it look nicer.
 
 1.2.8: (Jun/8/2011)
-
     * New: Fuel Rescue option, if fuel tank is empty the script will buy enough fuel to fly the aircraft, no matter what the price is.
     * New: Autopilot Controlbox is movable, and the position will be saved.
     * Fix: Pages fetched will use the same protocol as the main page (http or https).
@@ -25,7 +30,6 @@ Change log:
     * Removed some unused code.
 
 1.2.7:
-
     * Added Cargo flights.
     * Script tested and works under Google Chrome using “tampermonkey” extension.
     * Fixed some compatibility with Google Chrome.
@@ -33,7 +37,6 @@ Change log:
     * Increasing the delay and random delay between tasks, to help people with slow connections and make the script a bit harder to detect.
 
 1.2.6:
-
     * Server update check of the script is back.
     * Added Tooltips to explain the functionality of the controlbox.
     * Enhanced fly function (if there are more than 10 aircraft waiting it will fly them in the same run).
@@ -43,7 +46,6 @@ Change log:
     * Fix to the fly link (by Olla)
 
 1.2.4:
-
     * Fixed the script after the game code was updated.
     * Removed the Check4Update function  <– since this will be the last update (sorry guys, i would love to keep doing this but I have other stuff to do)
     * Included the developer code (all the code that I use for myself including the unused functions, debuging stuff)
@@ -52,23 +54,19 @@ Change log:
           o Check4Update is still there but disabled, i will remove the file from my server later so the function will not be useful for this script but I kept the code for others to use if someone want to take over.
 
 1.2.3:
-
     * Fuel, now you can auto buy fuel by checking the fuel checkbox and setting the maximum amount needed and the highest price. It will check once every hour.
       (I found a way to fly the airplanes even with no fuel (negative amount) and was about to include it in the script but thought that would be cheating so I did not.)
 
 1.2.2:
-
     * Added ability to buy catering by selecting the type and amount, so it buys them before flying the airplanes. But you have to make sure that you put the right amount for the selected catering type (minimum and maximum) by following the values giving by the game otherwise it will not buy them. And when the catering finishes it will buy them again in the next round.
 
 1.2.1:
-
     * Added Note taker to keep notes about the game, like airport names, what to buy next…etc.
     * Fixed a bug in autoupdate if the version file on the server is not accessible.
     * Added a timeout for waiting loops so they will not loop forever in case a page did not load correctly.
     * Refresh (reload) the facebook page, including AM page, every 20 iterations to overcome a bug in AM (which i have no control over) that appears after keeping the script running for long time.
 
 1.2.0:
-
 This version went through a restructuring of the code. In the previous versions I was injecting the whole code inside the AM page (AM iframe inside Facebook page to be precise) and because of that I was also storing the script settings as AM cookies. This approach is simple and makes interacting with the page easy, however, it makes it easy for AM admins to detect the script by either adding a function that searches for my functions or the entries in the cookies. In order to solve this problem I changed the way the script works. Now when you open the AM game under Facebook my script will be loaded twice, the first instance will load under Facebook frame and it will inject the AP Control box in that frame, which AM has no access to so they cannot detect it. The second instance will load under AM frame, however, it will not inject anything but rather will remain in Greasemonkey sandbox and that is also hidden from AM cannot be detected. The last thing is the settings which are now being stored in Firefox itself under GM settings using GM functions (GM_getValue & GM_setValue). The two script instances are working separately and cannot communicate with each other since they run under different domains (facebook.com & airlinemanager.activewebs.dk) as this is a security feature enforced by Firefox to prevent malicious websites from accessing other websites functions and variables. To overcome this obstacle I used the GM stored settings which are shared by both instances to communicate. In addition to all of that I added some randomization to the timer so executing the tasks will not happen at the exact intervals.
 
     * Replaced using (eval) which can be harmful with location.assign
@@ -86,19 +84,16 @@ This version went through a restructuring of the code. In the previous versions 
     * I expect this version to have many bugs, because I did many changes. Also there are still some changes that I wanted to do but decided to release this first and work later on these changes and whatever bugs you guys find.
 
 1.1.2:
-
     * More enhancement to the C-Check and Repair, it should miss less repairs and checks now. Basically I increased the waiting delay between tasks to give more time for the pages to load before starting the new one. If your internet connection is slow and the script does not work as it should then try increasing the delay by modifying this part of the script “fDelay=5000″, 5000 means 5 seconds, set the value to something suitable for your net speed.
     * Repairs and C-Checks will not work after the new AM update (April-08), so in order to keep using the script to fly airplanes uncheck the repair box, and kindly wait for the coming update.
 
 1.1.1:
-
     * Solved the problem of not working under Firefox 3.6.x.
     * Removed the dependency on jQuery.
     * Fixed a bug that causes the control box not to show if the airline is not AM trusted.
     * The C-Check and Repairs are not perfect and it get missed sometimes
 
 1.1.0:
-
     * Major change in how the script works.
     * Added the ability to repair airplanes and do C-Check before flying them.
     * Save control box settings in AM cookies.
@@ -107,7 +102,6 @@ This version went through a restructuring of the code. In the previous versions 
     * This version does not work with the new Firefox 3.6.x, I am trying to solve this issue.
 
 1.0.0:
-
     * Inisial release.
 
 
