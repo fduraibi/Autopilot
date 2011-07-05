@@ -15,7 +15,7 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.10c
+// @version    1.2.10d
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
 // @ThanksTo    Olla, Luke, [All of you users and commenters]
@@ -273,56 +273,32 @@ function f_Cargo(){
     } else{
 	fSL=0;
 
-	// Count the number of flight which are ready (so if we have more than 10 call the fly function again
-	var a_List = d_fly.getElementsByTagName('a');
-	GM_log('Cargo a_List.length = ' + a_List.length);
-
-	if (a_List.length === 1){
-	    GM_log('Cargo a_list is 1!!! try again');
-	    window.setTimeout(f_Fly, fDelay+fRand(fRndDelay));
-	} else {
-
-	    var f_Count = 0;
-	    for (var i = 0; i < a_List.length; i++) {
+	// Look for the Start Routes button and click it
+	var d2_fly = document.getElementById('flightStarter');
+	if (d2_fly !== null){
+	    var att;
+	    var fL=false;
+	    a_List = d2_fly.getElementsByTagName('a');
+	    for (i = 0; i < a_List.length; i++) {
 		att = a_List[i].getAttribute('onclick');
-		if (att!== null && att.search(/flightSingle/)>-1){
-		    f_Count = f_Count + 1;
+		if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_newC\.php/)>-1){
+		    location.assign( 'javascript:' + att + ';void(0)' );
+		    GM_log('Fly cargo..');
+		    fL = true;
+		    break;
 		}
 	    }
-	    GM_log('Number of ready Cargo flights is ' + f_Count);
-
-	    // Look for the Start Routes button and click it
-	    var d2_fly = document.getElementById('flightStarter');
-	    if (d2_fly !== null){
-		var att;
-		var fL=false;
-		a_List = d2_fly.getElementsByTagName('a');
-		for (i = 0; i < a_List.length; i++) {
-		    att = a_List[i].getAttribute('onclick');
-		    if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_newC\.php/)>-1){
-			location.assign( 'javascript:' + att + ';void(0)' );
-			GM_log('Fly cargo..');
-			fL = true;
-			break;
-		    }
-		}
-		if (fL === false){
-		    GM_log('Could not find the Cargo link...');
-		}
+	    if (fL === false){
+		GM_log('Could not find the Cargo link...');
+	    }else{
+		//run cargo function again to fly more routes if any
+		GM_log('Do we have more cargo routes to fly?....');
+		window.setTimeout(f_Cargo, fDelay+fRand(fRndDelay));
 	    }
-	    else{
-		GM_log('No cargo routes to fly...');
-	    }
-
-	    if (f_Count > 10){
-		GM_log('More cargo routes to fly....');
-		GM_setValue('fProg','Cargo');
-		window.setTimeout(f_openCargo, fDelay+fRand(fRndDelay));
-	    }
-	    else{
-		GM_log('Cargo-done.. see you later');
-		GM_setValue('fProg','');
-	    }
+	}
+	else{
+	    GM_log('Cargo-done.. see you later');
+	    GM_setValue('fProg','');
 	}
     }
 }
@@ -362,61 +338,37 @@ function f_Fly(){
     } else{
 	fSL=0;
 
-	// Count the number of flight which are ready (so if we have more than 10 call the fly function again
-	var a_List = d_fly.getElementsByTagName('a');
-	GM_log('a_List.length = ' + a_List.length);
-
-	if (a_List.length === 1){
-	    GM_log('a_list is 1!!! try again');
-	    window.setTimeout(f_Fly, fDelay+fRand(fRndDelay));
-	} else {
-
-	    var f_Count = 0;
-	    for (var i = 0; i < a_List.length; i++) {
+	// Look for the Start Routes button and click it
+	var d2_fly = document.getElementById('flightStarter');
+	if (d2_fly !== null){
+	    var att;
+	    var fL=false;
+	    a_List = d2_fly.getElementsByTagName('a');
+	    for (i = 0; i < a_List.length; i++) {
 		att = a_List[i].getAttribute('onclick');
-		if (att!== null && att.search(/flightSingle/)>-1){
-		    f_Count = f_Count + 1;
+		if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new\.php/)>-1){
+		    location.assign( 'javascript:' + att + ';void(0)' );
+		    GM_log('Fly them..');
+		    fL = true;
+		    break;
 		}
 	    }
-	    GM_log('Number of ready flights is ' + f_Count);
-
-	    // Look for the Start Routes button and click it
-	    var d2_fly = document.getElementById('flightStarter');
-	    if (d2_fly !== null){
-		var att;
-		var fL=false;
-		a_List = d2_fly.getElementsByTagName('a');
-		for (i = 0; i < a_List.length; i++) {
-		    att = a_List[i].getAttribute('onclick');
-		    if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new\.php/)>-1){
-			location.assign( 'javascript:' + att + ';void(0)' );
-			GM_log('Fly them..');
-			fL = true;
-			break;
-		    }
-		}
-		if (fL === false){
-		    GM_log('Could not find the Fly link...');
-		}
+	    if (fL === false){
+		GM_log('Could not find the Fly  ...');
+	    }else{
+		//run fly function again to fly more routes if any
+		GM_log('Do we have more routes to fly?....');
+		window.setTimeout(f_Fly, fDelay+fRand(fRndDelay));
 	    }
-	    else{
-		GM_log('No routes to fly...');
-	    }
-
-	    if (f_Count > 10){
-		GM_log('More routes to fly....');
-		GM_setValue('fProg','Fly');
-		window.setTimeout(f_openFlight, fDelay+fRand(fRndDelay));
-	    }
-	    else{
-		if(GM_getValue('fCargo','') === 'Checked'){
-		    GM_log('F-to-Cargo');
-		    GM_setValue('fProg','Cargo');
-		    window.setTimeout(f_openCargo, fDelay+fRand(fRndDelay));
-		} else{
-		    GM_log('F-done.. see you later');
-		    GM_setValue('fProg','');
-		}
+	}
+	else{
+	    if(GM_getValue('fCargo','') === 'Checked'){
+		GM_log('F-to-Cargo');
+		GM_setValue('fProg','Cargo');
+		window.setTimeout(f_openCargo, fDelay+fRand(fRndDelay));
+	    } else{
+		GM_log('F-done.. see you later');
+		GM_setValue('fProg','');
 	    }
 	}
     }
@@ -553,10 +505,9 @@ function f_CCheck(){
 	    } else{
 		for (var j = 0; j < i_List.length; j++) {
 		    att = i_List[j].getAttribute('value');
-		    GM_log('att = ' + att);
+		    GM_log('C-Check = ' + att);
 		    if (att!== null && att.search(/Perform all [0-9]* checks/)>-1){
 			GM_log('C-Check_All');
-			//GM_setValue('fProg','Fly');
 			i_List[j].click();
 			break;
 		    }
@@ -615,7 +566,7 @@ function f_BuyCatering(){
 	url: URL,
 	onload: function(response) {
 	    if (response.status === 200){
-		GM_log('Response = ' + stripTags(response.responseText));
+		GM_log('Catering = ' + stripTags(response.responseText));
 	    } else{
 		GM_log('Unable to fetch AM Catering page');
 	    }
@@ -723,7 +674,7 @@ function f_Fuel(){
 			    fAmnt = fFuelTankMax - Tank;
 			    GM_log('I feel lucky today :)   Fuel needed = ' + fAmnt);
 			    if( fAmnt > 0 ){
-			    BuyFuel(fAmnt);
+				BuyFuel(fAmnt);
 			    }   
 			} else if( Price <= GM_getValue('fFCost')){
 			    if((GM_getValue('fFuelFill') === 'Checked')){
@@ -1198,6 +1149,5 @@ window.setTimeout(addControls, fDelay);
 
 - Ads
 - Selling & buying aircraft
-- Update the flying routine to use the new Fly button instead of reloading the flight page every time.
 
 */
