@@ -15,7 +15,7 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.10
+// @version    1.2.10a
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
 // @ThanksTo    Olla, Luke, [All of you users and commenters]
@@ -77,6 +77,16 @@ function moveStop(){
     GM_setValue('fY-POS', divObj.DIV.style.top);
 }
 
+function FindVal(str, beforeVal, afterVal){ //Searches for a value between two strings and strips any non-digit characters
+    var loc1 = str.indexOf(beforeVal);
+    if (loc1 > -1){
+	var loc1len = str.indexOf(afterVal, loc1 + beforeVal.length);
+
+	return str.substring(loc1 + beforeVal.length, loc1len).replace(/[^0-9\-]/g, '');
+    } else
+	return null;
+}
+
 function stripTags(sText){  // Remove HTML tags (anything in between <*>), and replace any double space with single space
     return sText.replace(/<\/?[^>]+(>|$)/g, " ").replace('  ', ' ');
 }
@@ -129,139 +139,6 @@ function fCheck4Update(){
     }
 }
 
-//function f_Ads(){
-//    var d_route = document.getElementById('hroute');
-//    if (d_route === null && fSL < 20){
-//    GM_log('Ads-wait');
-//    fSL++;
-//    window.setTimeout(f_Ads, fDelay+fRand(fRndDelay));
-//    } else{
-//
-//    var i_List = d_route.getElementsByTagName('input');
-//    for (var j = 0; j < i_List.length; j++) {
-//        att = i_List[j].getAttribute('value');
-//        if (att!== null && att.toString() === '10'){
-//        i_List[j].checked=true;
-//        var fPrice = i_List[j].parentNode.nextSibling.innerHTML.replace(/[^0-9]/g, '');
-//        var fDate = new Date();
-//        GM_log(fPrice + ',' + (fDate.getMonth()+1) + '/' + fDate.getDate() + ' ' + fDate.getHours() + ':' + fDate.getMinutes())
-//
-//        GM_xmlhttpRequest({
-//            method: "POST",
-//            url: "http://fadvisor.net/am_data.php",
-//            data: "text=" + (fDate.getMonth()+1) + '/' + fDate.getDate() + ' ' + fDate.getHours() + ':' + fDate.getMinutes() + ',' + fPrice,
-//            headers: {
-//            "Content-Type": "application/x-www-form-urlencoded"
-//            },
-//            onload: function(response) {
-//            GM_log('Ads Post is ' + response.statusText);
-//            }
-//        });
-//        }
-//    }
-//
-//    GM_setValue('fProg','');
-//    fSL=0;
-//    GM_log('Ads-done');
-//    }
-//}
-//
-//function f_openAds(){
-//    var att;
-//    var fL=false;
-//    var d_route = document.getElementById('hroute');
-//    var a_List = d_route.getElementsByTagName('a');
-//    for (var i = 0; i < a_List.length; i++) {
-//    att = a_List[i].getAttribute('onclick');
-//    if (att!== null && att.search(/Fetch\('ads\.php/)>-1){
-//        location.assign( 'javascript:' + att + ';void(0)' );
-//        GM_log('Found Ads, open it..');
-//        fSL=0;
-//        window.setTimeout(f_Ads, fDelay+fRand(fRndDelay));
-//        fL = true;
-//        break;
-//    }
-//    }
-//    if (fL === false && fSL < 20){
-//    GM_log('Ads not found yet...');
-//    fSL++;
-//    window.setTimeout(f_openAds, fDelay+fRand(fRndDelay));
-//    }
-//}
-
-function f_Ads(){
-    var fDate = new Date();
-    GM_log('old time =' + GM_getValue('fFuelTime') + ' new= ' + fDate.getHours());
-    if (GM_getValue('fFuelTime') !== fDate.getHours() && fDate.getMinutes() > 5){
-	GM_setValue('fFuelTime',  fDate.getHours());
-
-	GM_xmlhttpRequest({
-	    method: 'GET',
-	    url: 'http://airlinemanager.activewebs.dk/am/fuel.php?' + FBSession,
-	    onload: function(response) {
-		if (response.status === 200){
-
-		    var SearchTank = 'Currently in tank:</b></td><td><b style=color:#3fa520>';
-		    var SearchPrice = 'Current fuel price:</td><td><font color=#2b98ec><b>$';
-		    var str = response.responseText;
-
-		    var loc1 = str.indexOf(SearchTank);
-		    if (loc1 > -1){
-			var loc1len = str.indexOf('<', loc1 + SearchTank.length);
-			var Tank = str.substring(loc1 + SearchTank.length, loc1len).replace(/[^0-9]/g, '');
-			GM_log('Tank amount is ' + Tank);
-
-			var loc2 = str.indexOf(SearchPrice);
-			if (loc2 > -1){
-			    var loc2len = str.indexOf('<', loc2 + SearchPrice.length);
-			    var Price = str.substring(loc2 + SearchPrice.length, loc2len).replace(/[^0-9]/g, '');
-			    GM_log('Fuel cost is ' + Price);
-
-			    if( Price <= GM_getValue('fFCost')){
-				var fAmnt
-				if(GM_getValue('fFuelFill') === 'Checked'){
-				    fAmnt = fFuelTankMax - Tank;
-				}else{
-				    fAmnt = GM_getValue('fFAmount',1000000) - Tank;
-				}
-
-				GM_log('Fuel needed = ' + fAmnt);
-				if( fAmnt > 0 ){
-				    BuyFuel(fAmnt);
-				}
-			    }else{
-				GM_log('Fuel is expensive...  ;(');
-			    }
-
-			}else{
-			    GM_log('Price not found!! :(');
-			}
-		    }else{
-			GM_log('TankAmount not found!! :(');
-		    }
-		} else{
-		    GM_log('Unable to fetch AM Fuel page');
-		}
-	    }
-	});
-    }
-}
-
-function BuyAds(amount){
-    GM_xmlhttpRequest({
-	method: 'GET',
-	url: 'http://airlinemanager.activewebs.dk/am/fuel.php?' + FBSession + '&a=' + amount,
-	onload: function(response) {
-	    if (response.status === 200){
-		GM_log('I got Fuel');
-	    //GM_log(response.responseText);    // Show the response to know if fuel were purchased or maybe money is not enough!
-	    } else{
-		GM_log('Unable to fetch AM Fuel page');
-	    }
-	}
-    });
-}
-
 function f_Cargo(){
     var d_fly = document.getElementById('flight');
     if (d_fly === null && fSL < 20){
@@ -298,7 +175,7 @@ function f_Cargo(){
 	}
 	else{
 	    GM_log('Cargo-done.. see you later');
-	    GM_setValue('fProg','');
+	    GM_setValue('fRun','done');
 	}
     }
 }
@@ -362,14 +239,9 @@ function f_Fly(){
 	    }
 	}
 	else{
-	    if(GM_getValue('fCargo','') === 'Checked'){
-		GM_log('F-to-Cargo');
-		GM_setValue('fProg','Cargo');
-		window.setTimeout(f_openCargo, fDelay+fRand(fRndDelay));
-	    } else{
-		GM_log('F-done.. see you later');
-		GM_setValue('fProg','');
-	    }
+	    GM_log('Fly-done..');
+	    GM_setValue('fRun','cargo');
+	    fExecutionPipe();
 	}
     }
 }
@@ -385,7 +257,6 @@ function f_openFlight(){
 	    GM_log('Found F, open it..');
 	    fSL=0;
 	    window.setTimeout(f_Fly, fDelay+fRand(fRndDelay));
-	    //            window.setTimeout(f_FlyWithNoFuel, fDelay+fRand(1000));
 	    fL = true;
 	    break;
 	}
@@ -444,9 +315,9 @@ function f_Repair(){
 	else
 	    GM_log('Nothing to repair');
         
-	GM_log('R-time to fly');
-	GM_setValue('fProg','Fly');
-	window.setTimeout(f_openFlight, fDelay+fRand(fRndDelay));
+	GM_log('Repair done...');
+	GM_setValue('fRun','fly');
+	fExecutionPipe();
     }
 }
 
@@ -517,15 +388,9 @@ function f_CCheck(){
 	else
 	    GM_log('Nothing to c-check');
 
-	if(GM_getValue('fRepair','Checked') === 'Checked'){
-	    GM_log('C-call-to-Repair');
-	    GM_setValue('fProg','Repair');
-	    window.setTimeout(f_openRepair, fDelay+fRand(fRndDelay));
-	} else{
-	    GM_log('C-call-to-Fly');
-	    GM_setValue('fProg','Fly');
-	    window.setTimeout(f_openFlight, fDelay+fRand(fRndDelay));
-	}
+	GM_log('C-Check done...');
+	GM_setValue('fRun','repair');
+	fExecutionPipe();
     }
 }
 
@@ -570,72 +435,148 @@ function f_BuyCatering(){
 	    } else{
 		GM_log('Unable to fetch AM Catering page');
 	    }
+	    GM_setValue('fRun','ads');
+	    fExecutionPipe();
 	}
     });
 }
 
-function fBuyAirplane(){
+//function fBuyAirplane(){
+//
+//    fSL = fSL + 1;        // don't use the fSL variable, create something new for this function
+//
+//    GM_xmlhttpRequest({
+//	method: 'POST',
+//	url: 'http://airlinemanager.activewebs.dk/am/buy.php?' + FBSession,
+//	data: 'acid=4&engine=GP7270&reg=A383-' + fSL,
+//	//data: 'acid=298&engine=Mikulin AM-3&reg=T-' + fSL,
+//	headers: {
+//	    "Content-Type": "application/x-www-form-urlencoded"
+//	},
+//
+//	onload: function(response) {
+//	    GM_log(response.statusText + '  No. ' + fSL);
+//
+//	    if(fSL<48){
+//		window.setTimeout(fBuyAirplane, 500);
+//	    }else{
+//		GM_log('Done.....');
+//	    }
+//	}
+//    });
+//}
+//
+//var ap_id = new Array();
+//var count=0;
+//function fSellAirplane(){
+//    var d_sell = document.getElementById('fleet');
+//    var i_List = d_sell.getElementsByTagName('input');
+//    GM_log('List-> ' + i_List.length);
+//    for (var j = 0; j < i_List.length; j++) {
+//	att = i_List[j].getAttribute('name');
+//	if (att!== null && att === 'fid'){
+//	    ap_id[count] = i_List[j].getAttribute('value');
+//	    count = count + 1;
+//	}
+//    }
+//
+//    GM_log('Total found = ' + count);
+//    fSellAirplane2();
+//}
+//var iCo = 0;
+//function fSellAirplane2(){
+//    GM_xmlhttpRequest({
+//	method: 'POST',
+//	url: 'http://airlinemanager.activewebs.dk/am/sell.php?' + FBSession,
+//	data: 'fid=' + ap_id[iCo],
+//	headers: {
+//	    "Content-Type": "application/x-www-form-urlencoded"
+//	},
+//
+//	onload: function(response) {
+//	    GM_log(response.statusText + '  No. ' + iCo);
+//	    iCo = iCo + 1;
+//
+//	    if (iCo < count){
+//		window.setTimeout(fSellAirplane2, 500);
+//	    }else{
+//		GM_log('Done.....');
+//	    }
+//	}
+//    });
+//}
 
-    fSL = fSL + 1;        // don't use the fSL variable, create something new for this function
+function f_openAds(){
+    var isBuyAds = false;
+    var sURL;
+    if (isSSL())
+	sURL='https://airlinemanager.activewebs.dk/am/ads.php?' + FBSession;
+    else
+	sURL='http://airlinemanager.activewebs.dk/am/ads.php?' + FBSession;
 
     GM_xmlhttpRequest({
+	method: 'GET',
+	url: sURL,
+	onload: function(response) {
+	    if (response.status === 200){
+		var searchRoutes = '<td>Routes:</td><td>';
+		var searchAdRoutes = '<td>Routes with running ads:</td><td>';
+		var str = response.responseText;
+		
+		var NumRoutes = FindVal(str, searchRoutes, '<');
+		var NumAdRoutes = FindVal(str, searchAdRoutes, '<');
+		GM_log('Number of routes = ' + NumRoutes + '  Number of routes with ads = ' + NumAdRoutes);
+		
+		if (NumRoutes !== NumAdRoutes) {
+		    var searchPrice = "<input type='radio' name='type' value='10'></td><td> <font color=darkred>";
+		    var aPrice = FindVal(str, searchPrice, '<');
+		    GM_log('Ads cost is ' + aPrice);
+		    
+		    if( aPrice <= GM_getValue('fACost')){
+			isBuyAds = true;
+			BuyAds();
+		    } else{
+			GM_log("Ads are expensive :'(");
+		    }
+		    
+		} else{
+		    GM_log('No need for Ads.');
+		}
+	    } else{
+		GM_log('Unable to fetch Ads page Error: ' + response.status);
+	    }
+	    if (isBuyAds === false){
+		GM_setValue('fRun','ccheck');
+		fExecutionPipe();
+	    } 
+	}
+    });
+}
+
+function BuyAds(){
+    var sURL;
+    if (isSSL())
+	sURL='https://airlinemanager.activewebs.dk/am/ads.php?m=ins&tp=wh&' + FBSession;
+    else
+	sURL='http://airlinemanager.activewebs.dk/am/ads.php?m=ins&tp=wh&' + FBSession;
+    
+    GM_log('Ads Type=' + GM_getValue('lAds') + '    and Days=' + GM_getValue('lADays'))
+    GM_xmlhttpRequest({
 	method: 'POST',
-	url: 'http://airlinemanager.activewebs.dk/am/buy.php?' + FBSession,
-	data: 'acid=4&engine=GP7270&reg=A383-' + fSL,
-	//data: 'acid=298&engine=Mikulin AM-3&reg=T-' + fSL,
+	url: sURL + FBSession,
+	data: 'type=' + GM_getValue('lAds') + '&days=' + GM_getValue('lADays') +' &routes=all',
 	headers: {
 	    "Content-Type": "application/x-www-form-urlencoded"
 	},
 
 	onload: function(response) {
-	    GM_log(response.statusText + '  No. ' + fSL);
-
-	    if(fSL<48){
-		window.setTimeout(fBuyAirplane, 500);
-	    }else{
-		GM_log('Done.....');
+	    if (response.status === 200){
+		GM_log('I got Ads');
+	    } else{
+		GM_log('Unable to do Ads. Error=' + response.statusText);
 	    }
-	}
-    });
-}
-
-
-var ap_id = new Array();
-var count=0;
-function fSellAirplane(){
-    var d_sell = document.getElementById('fleet');
-    var i_List = d_sell.getElementsByTagName('input');
-    GM_log('List-> ' + i_List.length);
-    for (var j = 0; j < i_List.length; j++) {
-	att = i_List[j].getAttribute('name');
-	if (att!== null && att === 'fid'){
-	    ap_id[count] = i_List[j].getAttribute('value');
-	    count = count + 1;
-	}
-    }
-
-    GM_log('Total found = ' + count);
-    fSellAirplane2();
-}
-var iCo = 0;
-function fSellAirplane2(){
-    GM_xmlhttpRequest({
-	method: 'POST',
-	url: 'http://airlinemanager.activewebs.dk/am/sell.php?' + FBSession,
-	data: 'fid=' + ap_id[iCo],
-	headers: {
-	    "Content-Type": "application/x-www-form-urlencoded"
-	},
-
-	onload: function(response) {
-	    GM_log(response.statusText + '  No. ' + iCo);
-	    iCo = iCo + 1;
-
-	    if (iCo < count){
-		window.setTimeout(fSellAirplane2, 500);
-	    }else{
-		GM_log('Done.....');
-	    }
+	    GM_setValue('fRun','ccheck');
+	    fExecutionPipe();
 	}
     });
 }
@@ -643,6 +584,7 @@ function fSellAirplane2(){
 function f_Fuel(){
     var fAmnt
     var sURL;
+    var isBuyFuel = false;
     if (isSSL())
 	sURL='https://airlinemanager.activewebs.dk/am/fuel.php?' + FBSession;
     else
@@ -658,22 +600,19 @@ function f_Fuel(){
 		var SearchPrice = '<b>Current fuel price:</td><td><font color=#2b98ec><b>$';
 		var str = response.responseText;
 
-		var loc1 = str.indexOf(SearchTank);
-		if (loc1 > -1){
-		    var loc1len = str.indexOf('<', loc1 + SearchTank.length);
-		    var Tank = str.substring(loc1 + SearchTank.length, loc1len).replace(/[^0-9\-]/g, '');
+		var Tank = FindVal(str, SearchTank, '<');
+		if (Tank !== null){
 		    GM_log('Tank amount is ' + Tank);
 
-		    var loc2 = str.indexOf(SearchPrice);
-		    if (loc2 > -1){
-			var loc2len = str.indexOf('<', loc2 + SearchPrice.length);
-			var Price = str.substring(loc2 + SearchPrice.length, loc2len).replace(/[^0-9]/g, '');
+		    var Price = FindVal(str, SearchPrice, '<');
+		    if (Price !== null){
 			GM_log('Fuel cost is ' + Price);
 
 			if( GM_getValue('fFuelLuck') === 'Checked' && Price <= fLuckyFuelPrice){
 			    fAmnt = fFuelTankMax - Tank;
 			    GM_log('I feel lucky today :)   Fuel needed = ' + fAmnt);
 			    if( fAmnt > 0 ){
+				isBuyFuel = true;
 				BuyFuel(fAmnt);
 			    }   
 			} else if( Price <= GM_getValue('fFCost')){
@@ -685,6 +624,7 @@ function f_Fuel(){
 
 			    GM_log('Fuel needed = ' + fAmnt);
 			    if( fAmnt > 0 ){
+				isBuyFuel = true;
 				BuyFuel(fAmnt);
 			    }
 			}else{
@@ -692,6 +632,7 @@ function f_Fuel(){
 			    if (Tank < 1 && GM_getValue('fFuelRescue') === 'Checked'){
 				fAmnt = (Tank * -1) + 1;
 				GM_log('We need ' + fAmnt + ' Lbs of fuel no matter what the price is X-(')
+				isBuyFuel = true;
 				BuyFuel(fAmnt);
 			    }
 			}
@@ -704,8 +645,12 @@ function f_Fuel(){
 	    } else{
 		GM_log('Unable to fetch AM Fuel page');
 	    }
+	    if (isBuyFuel === false){
+		GM_setValue('fRun','catering');
+		fExecutionPipe();
+	    }  
 	}
-    });
+    }); 
 }
 
 function BuyFuel(amount){
@@ -725,6 +670,8 @@ function BuyFuel(amount){
 	    } else{
 		GM_log('Unable to fetch AM Fuel page');
 	    }
+	    GM_setValue('fRun','catering');
+	    fExecutionPipe();
 	}
     });
 }
@@ -750,53 +697,82 @@ function GetFBSession(){    // Get the token ID for any link that has the token 
     }
 }
 
+function fExecutionPipe(){
+    fSL=0;
+    
+    if(GM_getValue('fRun') === 'fuel'){
+	if(GM_getValue('fFuel') === 'Checked'){
+	    GM_log('Check Fuel...');
+	    f_Fuel();
+	} else{
+	    GM_setValue('fRun','catering');
+	}
+    }
+
+    if(GM_getValue('fRun') === 'catering'){
+	if(GM_getValue('fCatering') === 'Checked'){
+	    GM_log('Buy Catering...');
+	    f_BuyCatering();
+	} else{
+	    GM_setValue('fRun','ads');
+	}
+    }
+    
+    if(GM_getValue('fRun') === 'ads'){
+	if(GM_getValue('fAds','Checked') === 'Checked'){
+	    GM_log('Do Ads...');
+	    f_openAds();
+	} else{
+	    GM_setValue('fRun','ccheck');
+	}
+    }
+    
+    if(GM_getValue('fRun') === 'ccheck'){
+	if(GM_getValue('fCheck','Checked') === 'Checked'){
+	    GM_log('Do CCheck...');
+	    f_openCCheck();
+	} else{
+	    GM_setValue('fRun','repair');
+	}
+    }
+    
+    if(GM_getValue('fRun') === 'repair'){
+	if(GM_getValue('fRepair','Checked') === 'Checked'){
+	    GM_log('Do Repair...');
+	    f_openRepair();
+	} else{
+	    GM_setValue('fRun','fly');
+	}
+    }
+    
+    if(GM_getValue('fRun') === 'fly'){
+	GM_log('I believe I can fly...');
+	f_openFlight();
+    }
+    
+    if(GM_getValue('fRun') === 'cargo'){
+	if(GM_getValue('fCargo','') === 'Checked'){
+	    GM_log('Fly cargo...');
+	    f_openCargo();
+	} else{
+	    GM_setValue('fRun','done');
+	}
+    }
+}
+
 function fPoller(){
-    if(GM_getValue('fRun') === 'true'){
-	GM_setValue('fRun','false');
+    if(GM_getValue('fRun') === 'start'){
+	GM_setValue('fRun','fuel');
 	GM_log('Start');
 	
 	fDelay = GM_getValue('fDelay','4') * 1000;	    //load the delay value and converts it into milliseconds
 	fRndDelay = GM_getValue('fRndDelay','5') * 1000;
 
 	GetFBSession();
-
-	if(GM_getValue('fFuel') === 'Checked'){
-	    GM_log('Check Fuel...');
-	    f_Fuel();
-	}
-
-	if(GM_getValue('fCatering') === 'Checked'){
-	    GM_log('Buy Catering...');
-	    f_BuyCatering();
-	}
-
-	if(GM_getValue('fCheck','Checked') === 'Checked'){
-	    GM_setValue('fProg','DoCheck');
-	    fSL=0;
-	    f_openCCheck();
-	} else if(GM_getValue('fRepair','Checked') === 'Checked'){
-	    GM_setValue('fProg','DoRepair');
-	    fSL=0;
-	    f_openRepair();
-	} else{
-	    GM_setValue('fProg','DoFly');
-	    fSL=0;
-	    f_openFlight();
-	}
+	
+	fExecutionPipe();
     }
-    else if (GM_getValue('fLoadAM') === 1 ){
-	GM_setValue('fLoadAM',0);
-	if(GM_getValue('fProg') === 'Repair'){
-	    GM_setValue('fProg','DoRepair');
-	    GM_log('Do Repair');
-	    window.setTimeout(f_openRepair, fDelay+fRand(fRndDelay));
-	} else if(GM_getValue('fProg') === 'Fly'){
-	    GM_setValue('fProg','DoFly');
-	    GM_log('Do Fly');
-	    window.setTimeout(f_openFlight, fDelay+fRand(fRndDelay));
-	}
-    }
-    //    GM_log('polling.. ');
+
     window.setTimeout(fPoller, 4000);
 }
 
@@ -841,7 +817,7 @@ function ff_Countdown(){
 	    fsec = fRand(6) * 10;   //Randomize the starting time as well
 	    //fCheck4Update();
 	    fML++;
-	    GM_setValue('fRun','true');
+	    GM_setValue('fRun','start');
 	} else{
 	    reLoadMe('Been running for long time,, time to reload..');
 	}
@@ -983,11 +959,8 @@ function addControls(){
 
     if (fAM !== null){    // check if this is Airline Manager frame
 	GM_log('AM_Loaded, start polling. l=' + location.href.toString().substr(0, 60));
-	GM_setValue('fLoadAM',1);
 	window.setTimeout(fPoller, fRand(1000));
     } else if (fFB !== null && fAP === null){    // check if this is Facebook frame, and check if Controls box is not already loaded
-	GM_setValue('fProg','');
-
 	var f_html = <><![CDATA[
 	<div id="fAMAP" style="position: absolute; top: [Y-POS]; left: [X-POS]; background: none repeat scroll 0% 0% #3B5DA1; border-color:#9DAAB8; border-style: solid; border-width: 1px;">
 	<table bgcolor=#EBEBFF border="0" cellpadding="2" cellspacing="0" style=" border-color:#9DAAB8; border-bottom-style: solid; border-bottom-width: 1px; border-top-style: solid; border-top-width: 1px;">
@@ -1031,23 +1004,25 @@ function addControls(){
 	</tr>
 	<tr id="dAds" style="display:none">
 	<td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;">
-	<input title="Enable buying ads" type="checkbox" name="fAds" fAdsReplace id="fAds" style="margin-top : 0px;" DISABLED>Ads
-	|  If price is or below <input title="The maximum price that you would like to pay for ads, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price)" type="text" name="fACost" value=fACostReplace size="5px" maxlength="5" id="fACost" style="text-align : center;">
+	<table><tr><td>
+	<input title="Enable buying advertisments" type="checkbox" name="fAds" fAdsReplace id="fAds" style="margin-top : 0px;">Ads
+	|  If price is or below <input title="The maximum price that you would like to pay for ads, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price) *Use the prices of the most expensive ad, even if you are buying another type*" type="text" name="fACost" value=fACostReplace size="5px" maxlength="5" id="fACost" style="text-align : center;">
 	<a title="See the price prediction at this link" href="http://fadvisor.net/blog/2010/06/airlinemanager-ads-prices/"> @</a>
-	<br>
+	</td></tr><tr><td>
 	<select title="Select the type of advertising you like to buy" id="lAds">
-	<option value="0" lAds0Selected>Newspaper advertising</option>
-	<option value="1" lAds1Selected>1 tv commercial</option>
-	<option value="2" lAds2Selected>Internet: In major search engines</option>
-	<option value="3" lAds3Selected>Internet: In major social networks</option>
-	<option value="4" lAds4Selected>Bus and Taxi posters</option>
-	<option value="5" lAds5Selected>10 tv commercials + newspaper ads</option>
-	<option value="6" lAds6Selected>Cross country newspaper advertising</option>
-	<option value="7" lAds7Selected>Billboards on major streetsg</option>
-	<option value="8" lAds8Selected>Billboards on 1 major airport</option>
-	<option value="9" lAds9Selected>Billboards on 20 international airports</option>
-	</select><br><br>
-	<select id="lADays">
+	<option value="1" lAds1Selected>Newspaper advertising</option>
+	<option value="2" lAds2Selected>1 tv commercial</option>
+	<option value="3" lAds3Selected>Internet: In major search engines</option>
+	<option value="4" lAds4Selected>Internet: In major social networks</option>
+	<option value="5" lAds5Selected>Bus and Taxi posters</option>
+	<option value="6" lAds6Selected>10 tv commercials + newspaper ads</option>
+	<option value="7" lAds7Selected>Cross country newspaper advertising</option>
+	<option value="8" lAds8Selected>Billboards on major streetsg</option>
+	<option value="9" lAds9Selected>Billboards on 1 major airport</option>
+	<option value="10" lAds10Selected>Billboards on 20 international airports</option>
+	</select>
+	</td></tr><tr><td>
+	<select title="Select the number of days to by ads for" id="lADays">
 	<option value="1" lADay1Selected>1 Day</option>
 	<option value="2" lADay2Selected>2 Days</option>
 	<option value="3" lADay3Selected>3 Days</option>
@@ -1055,7 +1030,8 @@ function addControls(){
 	<option value="5" lADay5Selected>5 Days</option>
 	<option value="6" lADay6Selected>6 Days</option>
 	<option value="7" lADay7Selected>7 Days</option>
-	</select>* To be implemented *
+	</select>
+	</td></tr></table>
 	</td>
 	</tr>
 	<tr id="dBuySell" style="display:none">
@@ -1095,9 +1071,9 @@ function addControls(){
 	f_html = f_html.toString().replace(/lCatering.?Selected/g, '');
 	f_html = f_html.toString().replace('fAdsReplace', GM_getValue('fAds',''));
 	f_html = f_html.toString().replace('fACostReplace', GM_getValue('fACost',7500));
-	f_html = f_html.toString().replace('lAds' + GM_getValue('lAds',9) + 'Selected', 'selected="yes"');
+	f_html = f_html.toString().replace('lAds' + GM_getValue('lAds',10) + 'Selected', 'selected="yes"');
 	f_html = f_html.toString().replace(/lAds.?Selected/g, '');
-	f_html = f_html.toString().replace('lADay' + GM_getValue('lADays',7) + 'Selected', 'selected="yes"');
+	f_html = f_html.toString().replace('lADay' + GM_getValue('lADays',6) + 'Selected', 'selected="yes"');
 	f_html = f_html.toString().replace(/lADay.?Selected/g, '');
 
 	var fdiv = document.createElement("div");
@@ -1147,7 +1123,8 @@ window.setTimeout(addControls, fDelay);
 
 /*------------ To Do list --------------
 
-- Ads
 - Selling & buying aircraft
+
+- Add to Options Box Lucky fuel price and Max fuel tank
 
 */
