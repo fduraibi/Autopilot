@@ -15,7 +15,7 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.11a
+// @version    1.2.11b
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
 // @ThanksTo    Olla, Luke, [All of you users and commenters]
@@ -58,8 +58,8 @@ function replaceText(sId, sText){    // A the name says, it sets the text of an 
 var divObj = new Object();  // The DIV object for the controlbox
 function moveMe(event){
     divObj.DIV = document.getElementById('fAMAP');	
-    divObj.Left  = parseInt(divObj.DIV.style.left) - event.pageX;
-    divObj.Top   = parseInt(divObj.DIV.style.top) - event.pageY;
+    divObj.Left = parseInt(divObj.DIV.style.left) - event.pageX;
+    divObj.Top = parseInt(divObj.DIV.style.top) - event.pageY;
 
     document.getElementById('fTitleBar').addEventListener("mousemove", moveStart, true);
     document.getElementById('fTitleBar').addEventListener("mouseup", moveStop, false);
@@ -962,48 +962,45 @@ function addControls(){
 	window.setTimeout(fPoller, fRand(1000));
     } else if (fFB !== null && fAP === null){    // check if this is Facebook frame, and check if Controls box is not already loaded
 	var f_html = <><![CDATA[
-	<div id="fAMAP" style="position: absolute; top: [Y-POS]; left: [X-POS]; background: none repeat scroll 0% 0% #3B5DA1; border-color:#9DAAB8; border-style: solid; border-width: 1px;">
-	<table bgcolor=#EBEBFF border="0" cellpadding="2" cellspacing="0" style=" border-color:#9DAAB8; border-bottom-style: solid; border-bottom-width: 1px; border-top-style: solid; border-top-width: 1px;">
-	<caption id="fTitleBar" title="Click on me to move the box"><font color="white">Airline Manager Autopilot</font></caption><tr>
-	<td><input title="Start or Stop the script" type="button" id="Autopilot" value="Autopilot"></td>
+	<div id="fAMAP" style="top: [Y-POS]; left: [X-POS];">
+	<table border="0" cellpadding="2" cellspacing="0" class="table1">
+	<caption id="fTitleBar" title="Click on me to move the box" class="title">Airline Manager Autopilot</caption>
+	<tr><td><input title="Start or Stop the script" type="button" id="Autopilot" value="Autopilot"></td>
 	<td style="border-left-style : solid; border-left-width : 1px; border-color:#9DAAB8;"><input title="Time to wait between each run" type="text" name="f_timefreq" value=fTimeReplace size="1px" maxlength="2" id="f_timefreq" style="text-align : center;">min +</td>
 	<td colspan=2>Random<input title="A random value (between 0 & what you set) added to the wait time." type="text" name="f_randtime" value=fRTimeReplace size="1px" maxlength="2" id="f_randtime" style="text-align : center;" alt="Random Time"></td></tr>
 	<tr><td title="Status of the script (or count down to when it will run next)" id="f_timer" bgcolor="#ff0000" style="text-align : center;">Stopped</td>
 	<td style="border-left-style : solid; border-left-width : 1px; border-color:#9DAAB8;"><input title="Enable doing c-check on aircraft before flying them" type="checkbox" name="fCheck" fCheckReplace id="fCheck" style="margin-top : 0px;">C-Check</td>
 	<td><input title="Enable repairing aircraft before flying them" type="checkbox" name="fRepair" fRepairReplace id="fRepair" style="margin-top : 0px;">Repair</td>
-	<td><input title="Enable flying Cargo aircraft (* only if you have them)" type="checkbox" name="fCargo" fCargoReplace id="fCargo" style="margin-top : 0px;">Fly Cargo</td>
-	</tr>
-	</table>
-	<table bgcolor=#EBEBFF border="0" cellpadding="2" cellspacing="0" style="width: 100%;"><tr>
-	<td><a title="Open the Options" href="javascript:;//Open Options" onmousedown='if(document.getElementById("dOptions").style.display == "none"){ document.getElementById("dOptions").style.display = "table-row"; }else{ document.getElementById("dOptions").style.display = "none"; }'>[O]</a>&nbsp;
-	<a title="Open the Catering Settings" href="javascript:;//Open Catering" onmousedown='if(document.getElementById("dCatering").style.display == "none"){ document.getElementById("dCatering").style.display = "table-row"; }else{ document.getElementById("dCatering").style.display = "none"; }'>[C]</a>&nbsp;
-	<a title="Open the Fuel Settings" href="javascript:;//Open Fuel" onmousedown='if(document.getElementById("dFuel").style.display == "none"){ document.getElementById("dFuel").style.display = "table-row"; }else{ document.getElementById("dFuel").style.display = "none"; }'>[F]</a>&nbsp;
-	<a title="* To be implemented * Open the Advertising Settings" href="javascript:;//Open Ads" onmousedown='if(document.getElementById("dAds").style.display == "none"){ document.getElementById("dAds").style.display = "table-row"; }else{ document.getElementById("dAds").style.display = "none"; }'>[A]</a>&nbsp;
-	<a title="* To be implemented * Open the Buy & Sell Aircraft Settings" href="javascript:;//Open Buy&Sell" onmousedown='if(document.getElementById("dBuySell").style.display == "none"){ document.getElementById("dBuySell").style.display = "table-row"; }else{ document.getElementById("dBuySell").style.display = "none"; }'>[$]</a>&nbsp;
-	<a title="Open the Note box" href="javascript:;//Open Note" onmousedown='if(document.getElementById("dNote").style.display == "none"){ document.getElementById("dNote").style.display = "table-row"; }else{ document.getElementById("dNote").style.display = "none"; }'>[N]</a>&nbsp;
+	<td><input title="Enable flying Cargo aircraft (* only if you have them)" type="checkbox" name="fCargo" fCargoReplace id="fCargo" style="margin-top : 0px;">Fly Cargo</td></tr>
+	
+	<tr><td colspan=2 class="cellS"><a title="Open the Options" href="javascript:;//Open Options" onmousedown='if(document.getElementById("dOptions").style.display == "none"){ showTab("dOptions"); }else{ showTab(""); }'>[O]</a>&nbsp;
+	<a title="Open the Catering Settings" href="javascript:;//Open Catering" onmousedown='if(document.getElementById("dCatering").style.display == "none"){ showTab("dCatering"); }else{ showTab(""); }'>[C]</a>&nbsp;
+	<a title="Open the Fuel Settings" href="javascript:;//Open Fuel" onmousedown='if(document.getElementById("dFuel").style.display == "none"){ showTab("dFuel"); }else{ showTab(""); }'>[F]</a>&nbsp;
+	<a title="* To be implemented * Open the Advertising Settings" href="javascript:;//Open Ads" onmousedown='if(document.getElementById("dAds").style.display == "none"){ showTab("dAds"); }else{ showTab(""); }'>[A]</a>&nbsp;
+	<a title="* To be implemented * Open the Buy & Sell Aircraft Settings" href="javascript:;//Open Buy&Sell" onmousedown='if(document.getElementById("dBuySell").style.display == "none"){ showTab("dBuySell"); }else{ showTab(""); }'>[$]</a>&nbsp;
+	<a title="Open the Note box" href="javascript:;//Open Note" onmousedown='if(document.getElementById("dNote").style.display == "none"){ showTab("dNote"); }else{ showTab(""); }'>[N]</a>&nbsp;
 	<a title="Visit the script website" href="http://fadvisor.net/blog/2010/03/auto-pilot/">@</a>
-	</td><td  id="f_status" style="color: red;"></td></tr>
-	<tr id="dOptions" style="display:none"><td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;">
+	</td><td  id="f_status" colspan=2 class="cellS" style="color: red;"></td></tr>
+	<tr id="dOptions" style="display:none"><td colspan="4" align="center" class="cellS">
 	<input title="Start the script immediatly after loading the AM page" type="checkbox" name="fAutoStart" fAutoStartReplace id="fAutoStart" style="margin-top : 0px;">Auto Start on load<br>
 	Tasks Delay<input title="Set the amount of delay between tasks [in seconds] (if you don't know what this means then don't change it)" type="text" name="fDelay" value=fDelayReplace size="1px" maxlength="2" id="fDelay" style="text-align : center;">
 	Tasks Random Delay<input title="Set the maximum random value added to the delay [in seconds] (if you don't know what this means then don't change it)" type="text" name="fRndDelay" value=fRndDelayReplace size="1px" maxlength="2" id="fRndDelay" style="text-align : center;">
 	</td></tr>
-	<tr id="dCatering" style="display:none">
-	<td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;"><input title="Enable buying catering before flying the aircraft (will only buy if you don't have any)" type="checkbox" name="fCatering" fCateringReplace id="fCatering" style="margin-top : 0px;">Catering
+	<tr id="dCatering" style="display:none"><td colspan="4" align="center" class="cellS">
+	<input title="Enable buying catering before flying the aircraft (will only buy if you don't have any)" type="checkbox" name="fCatering" fCateringReplace id="fCatering" style="margin-top : 0px;">Catering
 	<select title="Select the type of catering you like to buy" id="lCatering"><option value="7" lCatering7Selected>7- Sky+</option><option value="6" lCatering6Selected>6- Sky Catering</option><option value="5" lCatering5Selected>5- Sky Burgers</option>
 	<option value="4" lCatering4Selected>4- Fast Food</option><option value="3" lCatering3Selected>3- Sky Fish</option><option value="2" lCatering2Selected>2- Cloud Chefs</option><option value="1" lCatering1Selected>1- AM Catering</option></select>
-	Amount<input title="Set the amount of catering to buy (you should follow the min & max values set by the game)" type="text" name="fCAmount" value=fCAmountReplace size="4px" maxlength="5" id="fCAmount" style="text-align : center;"></td>
-	</tr>
-	<tr id="dFuel" style="display:none">
-	<td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;"><input title="Enable buying fuel" type="checkbox" name="fFuel" fFuelReplace id="fFuel" style="margin-top : 0px;">Fuel&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+	Amount<input title="Set the amount of catering to buy (you should follow the min & max values set by the game)" type="text" name="fCAmount" value=fCAmountReplace size="4px" maxlength="5" id="fCAmount" style="text-align : center;">
+	</td></tr>
+	<tr id="dFuel" style="display:none"><td colspan="4" align="center" class="cellS">
+	<input title="Enable buying fuel" type="checkbox" name="fFuel" fFuelReplace id="fFuel" style="margin-top : 0px;">Fuel&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
 	If price is or below <input title="The maximum price that you would like to pay for fuel, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price)" type="text" name="fFCost" value=fFCostReplace size="4px" maxlength="4" id="fFCost" style="text-align : center;"><br>
 	fill tank<input title="Check this box if you want the script to fill the tank to the maximum when the price is what you want" type="checkbox" name="fFuelFill" fFuelFillReplace id="fFuelFill" style="margin-top : 0px;">
 	or fill up to <input title="The desired amount of fuel that you want to have in your tank" type="text" name="fFAmount" value=fFAmountReplace size="9px" maxlength="9" id="fFAmount" style="text-align : center;"><br>
 	<input title="If the tank is empty then buy enough fuel to fly the aircraft even if it is expensive" type="checkbox" name="fFuelRescue" fFuelRescueReplace id="fFuelRescue" style="margin-top : 0px;">Fuel Rescue
-	<input title="When the fuel price drops to fLuckyFuelPriceReplace or below fill the tank" type="checkbox" name="fFuelLuck" fFuelLuckReplace id="fFuelLuck" style="margin-top : 0px;">Lucky Fuel</td>
-	</tr>
-	<tr id="dAds" style="display:none">
-	<td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;">
+	<input title="When the fuel price drops to fLuckyFuelPriceReplace or below fill the tank" type="checkbox" name="fFuelLuck" fFuelLuckReplace id="fFuelLuck" style="margin-top : 0px;">Lucky Fuel
+	</td></tr>
+	<tr id="dAds" style="display:none"><td colspan="4" align="center" class="cellS">
 	<table><tr><td>
 	<input title="Enable buying advertisments" type="checkbox" name="fAds" fAdsReplace id="fAds" style="margin-top : 0px;">Ads
 	|  If price is or below <input title="The maximum price that you would like to pay for ads, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price) *Use the prices of the most expensive ad, even if you are buying another type*" type="text" name="fACost" value=fACostReplace size="5px" maxlength="5" id="fACost" style="text-align : center;">
@@ -1034,16 +1031,14 @@ function addControls(){
 	</td></tr></table>
 	</td>
 	</tr>
-	<tr id="dBuySell" style="display:none">
-	<td colspan="2" align="center" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;">
+	<tr id="dBuySell" style="display:none"><td colspan="4" align="center" class="cellS">
 	Reserved for Buying and Selling aircraft
 	<br>
 	* To be implemented *
-	</td>
-	</tr>
-	<tr id="dNote" style="display:none">
-	<td colspan="2" style="border-top-style:solid; border-top-width:1px; border-color:#9DAAB8;"><textarea rows="4" style="width: 97%;" id="fNote">fNoteReplace</textarea></td>
-	</tr></table>
+	</td></tr>
+	<tr id="dNote" style="display:none"><td colspan="4" class="cellS">
+	<textarea rows="4" style="width: 97%;" id="fNote">fNoteReplace</textarea>
+	</td></tr></table>
 	</div>
 	]]></>;
 
@@ -1076,9 +1071,73 @@ function addControls(){
 	f_html = f_html.toString().replace('lADay' + GM_getValue('lADays',6) + 'Selected', 'selected="yes"');
 	f_html = f_html.toString().replace(/lADay.?Selected/g, '');
 
-	var fdiv = document.createElement("div");
+	var fdiv = document.createElement('div');
 	fdiv.innerHTML = f_html;
 	fFB.appendChild(fdiv);
+
+	var f_script = <><![CDATA[
+	function showTab(tabName){
+	document.getElementById("dOptions").style.display = "none";
+	document.getElementById("dCatering").style.display = "none";
+	document.getElementById("dFuel").style.display = "none";
+	document.getElementById("dAds").style.display = "none";
+	document.getElementById("dBuySell").style.display = "none";
+	document.getElementById("dNote").style.display = "none";
+	
+	if (tabName !== ""){
+	document.getElementById(tabName).style.display = "table-row";
+	}
+	}
+	]]></>;
+	var fscript = document.createElement('script');
+	fscript.innerHTML = f_script;
+	
+	document.head.appendChild(fscript);
+
+	var f_style = <><![CDATA[
+	#fAMAP {
+	position: absolute;
+	border-color: #9DAAB8;
+	border-style: solid;
+	border-width: 1px;
+	-moz-box-shadow: 3px 3px 4px #444;
+	-webkit-box-shadow: 3px 3px 4px #444;
+	box-shadow: 3px 3px 4px #444;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	}
+	
+	.title {
+	color: #fff;
+	font-weight:bold;
+	text-shadow:1px 1px 1px black;
+	background-image:-webkit-gradient(linear, 0 0, 0 100%, from(#91fcfc), to(#00bdff), color-stop(50%, #1277d7), color-stop(50%, #026bce));
+	background-image:-moz-linear-gradient(top left 270deg, #91fcfc, #1277d7 50%, #026bce 50%, #00bdff);
+	background-image:-o-linear-gradient(top left 270deg, #91fcfc, #1277d7 50%, #026bce 50%, #00bdff);
+	background-image:linear-gradient(top left 270deg, #91fcfc, #1277d7 50%, #026bce 50%, #00bdff);
+	-moz-border-radius: 3px 3px 0 0;
+	-webkit-border-radius: 3px 3px 0 0;
+	border-radius: 3px 3px 0 0;
+	}
+	
+	.table1 {
+	background-color: #ebebff;
+	-moz-border-radius: 0 0 3px 3px;
+	-webkit-border-radius: 0 0 3px 3px;
+	border-radius: 0 0 3px 3px;
+	}
+	
+	.cellS {
+	border-top-style:solid; 
+	border-top-width:1px; 
+	border-color:#9DAAB8;
+	}
+	]]></>;
+    
+	var fstyle = document.createElement('style');
+	fstyle.innerHTML = f_style;
+	document.head.appendChild(fstyle);
 
 	document.getElementById('fTitleBar').addEventListener('mousedown',moveMe,true);
 	document.getElementById('Autopilot').addEventListener('click',enableAutoPilot,false);
@@ -1106,7 +1165,6 @@ function addControls(){
 	document.getElementById('lAds').addEventListener('change',fASettings,false);
 	document.getElementById('lADays').addEventListener('change',fASettings,false);
 
-
 	if(document.getElementById('fFuelFill').checked === true){
 	    document.getElementById('fFAmount').value = fFuelTankMax;
 	    document.getElementById('fFAmount').disabled = true;
@@ -1124,7 +1182,6 @@ window.setTimeout(addControls, fDelay);
 /*------------ To Do list --------------
 
 - Selling & buying aircraft
-
 - Add to Options Box Lucky fuel price and Max fuel tank
 
 */
