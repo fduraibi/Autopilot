@@ -15,7 +15,7 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.11b
+// @version    1.2.11c
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
 // @ThanksTo    Olla, Luke, [All of you users and commenters]
@@ -31,8 +31,8 @@ var ftimeref;    // A refrence to the timer object so we can call it again to st
 var fSL=0;    // Global variable used for the number of rounds the script should wait for while loading a page before it stops
 var fML=0;    // Global variable that keep count of how many times the we ran the script after the AM page was loaded. (this is to solve a bug in AM) so after a number of rounds it will just refresh and reload the AM page.
 var FBSession;    // Stores the Facebook settion identifier for the user which AM uses when calling its own links to know the FB user.
-var fFuelTankMax=999999999; // Maximum amount of fuel a normal tank can have (that could change by AM)
-var fLuckyFuelPrice=50;
+var fFuelTankMax; // Maximum amount of fuel a normal tank can have (that could change by AM)
+var fLuckyFuelPrice;
 
 function fRand(value){    // Generates a random number between 1 and value (we use it mainly to add a random seconds while calling the AM funstions
     return Math.floor(Math.random() * (value+1));
@@ -765,8 +765,10 @@ function fPoller(){
 	GM_setValue('fRun','fuel');
 	GM_log('Start');
 	
-	fDelay = GM_getValue('fDelay','4') * 1000;	    //load the delay value and converts it into milliseconds
-	fRndDelay = GM_getValue('fRndDelay','5') * 1000;
+	fDelay = GM_getValue('fDelay',4) * 1000;	    //load the delay value and converts it into milliseconds
+	fRndDelay = GM_getValue('fRndDelay',5) * 1000;
+	fLuckyFuelPrice = GM_getValue('fLuckyFuelPrice',50);
+	fFuelTankMax = GM_getValue('fFuelTankMax',1000000000);
 
 	GetFBSession();
 	
@@ -897,7 +899,7 @@ function fSettings(){    // Store the script settings under Firefox
 
     if(document.getElementById('fFuelFill').checked === true){
 	GM_setValue('fFuelFill', 'Checked');
-	document.getElementById('fFAmount').value = fFuelTankMax;
+	document.getElementById('fFAmount').value = GM_getValue('fFuelTankMax',1000000000);
 	document.getElementById('fFAmount').disabled = true;
     } else{
 	GM_setValue('fFuelFill', '');
@@ -950,6 +952,8 @@ function fSettings(){    // Store the script settings under Firefox
     
     GM_setValue('fDelay',parseInt(document.getElementById('fDelay').value));
     GM_setValue('fRndDelay',parseInt(document.getElementById('fRndDelay').value));
+    GM_setValue('fLuckyFuelPrice',parseInt(document.getElementById('fLuckyFuelPrice').value));
+    GM_setValue('fFuelTankMax',parseInt(document.getElementById('fFuelTankMax').value));
 }
 
 function addControls(){
@@ -982,9 +986,14 @@ function addControls(){
 	<a title="Visit the script website" href="http://fadvisor.net/blog/2010/03/auto-pilot/">@</a>
 	</td><td  id="f_status" colspan=2 class="cellS" style="color: red;"></td></tr>
 	<tr id="dOptions" style="display:none"><td colspan="4" align="center" class="cellS">
-	<input title="Start the script immediatly after loading the AM page" type="checkbox" name="fAutoStart" fAutoStartReplace id="fAutoStart" style="margin-top : 0px;">Auto Start on load<br>
+	<input title="Start the script immediatly after loading the AM page" type="checkbox" name="fAutoStart" fAutoStartReplace id="fAutoStart" style="margin-top : 0px;">Auto Start on load
+	<br>
 	Tasks Delay<input title="Set the amount of delay between tasks [in seconds] (if you don't know what this means then don't change it)" type="text" name="fDelay" value=fDelayReplace size="1px" maxlength="2" id="fDelay" style="text-align : center;">
 	Tasks Random Delay<input title="Set the maximum random value added to the delay [in seconds] (if you don't know what this means then don't change it)" type="text" name="fRndDelay" value=fRndDelayReplace size="1px" maxlength="2" id="fRndDelay" style="text-align : center;">
+	<br>
+	Lucky fuel price<input title="Set the lowest price fuel does reach (if you don't know what this means then don't change it)" type="text" name="fLuckyFuelPrice" value=fLuckyFuelPriceReplace size="2px" maxlength="3" id="fLuckyFuelPrice" style="text-align : center;">
+	<br>
+	Max fuel tank capacity<input title="The maximum size of the fuel tank (if you don't know what this means then don't change it)" type="text" name="fFuelTankMax" value=fFuelTankMaxReplace size="8px" maxlength="10" id="fFuelTankMax" style="text-align : center;">
 	</td></tr>
 	<tr id="dCatering" style="display:none"><td colspan="4" align="center" class="cellS">
 	<input title="Enable buying catering before flying the aircraft (will only buy if you don't have any)" type="checkbox" name="fCatering" fCateringReplace id="fCatering" style="margin-top : 0px;">Catering
@@ -996,7 +1005,7 @@ function addControls(){
 	<input title="Enable buying fuel" type="checkbox" name="fFuel" fFuelReplace id="fFuel" style="margin-top : 0px;">Fuel&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
 	If price is or below <input title="The maximum price that you would like to pay for fuel, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price)" type="text" name="fFCost" value=fFCostReplace size="4px" maxlength="4" id="fFCost" style="text-align : center;"><br>
 	fill tank<input title="Check this box if you want the script to fill the tank to the maximum when the price is what you want" type="checkbox" name="fFuelFill" fFuelFillReplace id="fFuelFill" style="margin-top : 0px;">
-	or fill up to <input title="The desired amount of fuel that you want to have in your tank" type="text" name="fFAmount" value=fFAmountReplace size="9px" maxlength="9" id="fFAmount" style="text-align : center;"><br>
+	or fill up to <input title="The desired amount of fuel that you want to have in your tank" type="text" name="fFAmount" value=fFAmountReplace size="9px" maxlength="10" id="fFAmount" style="text-align : center;"><br>
 	<input title="If the tank is empty then buy enough fuel to fly the aircraft even if it is expensive" type="checkbox" name="fFuelRescue" fFuelRescueReplace id="fFuelRescue" style="margin-top : 0px;">Fuel Rescue
 	<input title="When the fuel price drops to fLuckyFuelPriceReplace or below fill the tank" type="checkbox" name="fFuelLuck" fFuelLuckReplace id="fFuelLuck" style="margin-top : 0px;">Lucky Fuel
 	</td></tr>
@@ -1046,6 +1055,8 @@ function addControls(){
 	f_html = f_html.toString().replace('[X-POS]', GM_getValue('fX-POS','5px'));
 	f_html = f_html.toString().replace('fTimeReplace', GM_getValue('fTime',8));
 	f_html = f_html.toString().replace('fRTimeReplace', GM_getValue('fRTime',4));
+	f_html = f_html.toString().replace('fLuckyFuelPriceReplace', GM_getValue('fLuckyFuelPrice',50));
+	f_html = f_html.toString().replace('fFuelTankMaxReplace', GM_getValue('fFuelTankMax',1000000000));
 	f_html = f_html.toString().replace('fRepairReplace', GM_getValue('fRepair','Checked'));
 	f_html = f_html.toString().replace('fCheckReplace', GM_getValue('fCheck','Checked'));
 	f_html = f_html.toString().replace('fCargoReplace', GM_getValue('fCargo',''));
@@ -1149,6 +1160,8 @@ function addControls(){
 	document.getElementById('fAutoStart').addEventListener('change',fSettings,false);
 	document.getElementById('fDelay').addEventListener('change',fSettings,false);
 	document.getElementById('fRndDelay').addEventListener('change',fSettings,false);
+	document.getElementById('fFuelTankMax').addEventListener('change',fSettings,false);
+	document.getElementById('fLuckyFuelPrice').addEventListener('change',fSettings,false);
 	document.getElementById('fCatering').addEventListener('change',fCSettings,false);
 	document.getElementById('lCatering').addEventListener('change',fCSettings,false);
 	document.getElementById('fCAmount').addEventListener('change',fCSettings,false);
@@ -1182,6 +1195,5 @@ window.setTimeout(addControls, fDelay);
 /*------------ To Do list --------------
 
 - Selling & buying aircraft
-- Add to Options Box Lucky fuel price and Max fuel tank
 
 */
