@@ -11,6 +11,13 @@ install/add this script to GreaseMonkey, now when you open the AirlineManager ga
 start and the control box will show at the top left of the page.
 
 Change log:
+1.2.11: (July/21/2011)
+    * New: Buying advertisement is now possible.
+    * Redesign the way tasks are being done to prevent some tasks from starting before other finish.
+    * Added two fields to change the lucky fuel price and the max fuel tank capacity.
+    * User interface enhancements.
+    * Better use of CSS to make the code look neat.
+
 1.2.10: (July/04/2011)
     * Enhanced fly function will not reload for every patch of aircraft.
     * New: Lucky Fuel, when the fuel price drops to 50 (which happens once a month) fill the tank.

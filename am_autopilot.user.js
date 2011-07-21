@@ -15,7 +15,7 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.11c
+// @version    1.2.11
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
 // @ThanksTo    Olla, Luke, [All of you users and commenters]
@@ -970,8 +970,8 @@ function addControls(){
 	<table border="0" cellpadding="2" cellspacing="0" class="table1">
 	<caption id="fTitleBar" title="Click on me to move the box" class="title">Airline Manager Autopilot</caption>
 	<tr><td><input title="Start or Stop the script" type="button" id="Autopilot" value="Autopilot"></td>
-	<td style="border-left-style : solid; border-left-width : 1px; border-color:#9DAAB8;"><input title="Time to wait between each run" type="text" name="f_timefreq" value=fTimeReplace size="1px" maxlength="2" id="f_timefreq" style="text-align : center;">min +</td>
-	<td colspan=2>Random<input title="A random value (between 0 & what you set) added to the wait time." type="text" name="f_randtime" value=fRTimeReplace size="1px" maxlength="2" id="f_randtime" style="text-align : center;" alt="Random Time"></td></tr>
+	<td style="border-left-style : solid; border-left-width : 1px; border-color:#9DAAB8;"><input title="Time to wait between each run" type="text" name="f_timefreq" value=fTimeReplace size="1px" maxlength="2" id="f_timefreq" class= "inputArea">min +</td>
+	<td colspan=2>Random<input title="A random value (between 0 & what you set) added to the wait time." type="text" name="f_randtime" value=fRTimeReplace size="1px" maxlength="2" id="f_randtime" class= "inputArea" alt="Random Time"></td></tr>
 	<tr><td title="Status of the script (or count down to when it will run next)" id="f_timer" bgcolor="#ff0000" style="text-align : center;">Stopped</td>
 	<td style="border-left-style : solid; border-left-width : 1px; border-color:#9DAAB8;"><input title="Enable doing c-check on aircraft before flying them" type="checkbox" name="fCheck" fCheckReplace id="fCheck" style="margin-top : 0px;">C-Check</td>
 	<td><input title="Enable repairing aircraft before flying them" type="checkbox" name="fRepair" fRepairReplace id="fRepair" style="margin-top : 0px;">Repair</td>
@@ -988,34 +988,34 @@ function addControls(){
 	<tr id="dOptions" style="display:none"><td colspan="4" align="center" class="cellS">
 	<input title="Start the script immediatly after loading the AM page" type="checkbox" name="fAutoStart" fAutoStartReplace id="fAutoStart" style="margin-top : 0px;">Auto Start on load
 	<br>
-	Tasks Delay<input title="Set the amount of delay between tasks [in seconds] (if you don't know what this means then don't change it)" type="text" name="fDelay" value=fDelayReplace size="1px" maxlength="2" id="fDelay" style="text-align : center;">
-	Tasks Random Delay<input title="Set the maximum random value added to the delay [in seconds] (if you don't know what this means then don't change it)" type="text" name="fRndDelay" value=fRndDelayReplace size="1px" maxlength="2" id="fRndDelay" style="text-align : center;">
+	Tasks Delay<input title="Set the amount of delay between tasks [in seconds] (if you don't know what this means then don't change it)" type="text" name="fDelay" value=fDelayReplace size="1px" maxlength="2" id="fDelay" class= "inputArea">
+	Tasks Random Delay<input title="Set the maximum random value added to the delay [in seconds] (if you don't know what this means then don't change it)" type="text" name="fRndDelay" value=fRndDelayReplace size="1px" maxlength="2" id="fRndDelay" class= "inputArea">
 	<br>
-	Lucky fuel price<input title="Set the lowest price fuel does reach (if you don't know what this means then don't change it)" type="text" name="fLuckyFuelPrice" value=fLuckyFuelPriceReplace size="2px" maxlength="3" id="fLuckyFuelPrice" style="text-align : center;">
+	Lucky fuel price<input title="Set the lowest price fuel does reach (if you don't know what this means then don't change it)" type="text" name="fLuckyFuelPrice" value=fLuckyFuelPriceReplace size="2px" maxlength="3" id="fLuckyFuelPrice" class= "inputArea">
 	<br>
-	Max fuel tank capacity<input title="The maximum size of the fuel tank (if you don't know what this means then don't change it)" type="text" name="fFuelTankMax" value=fFuelTankMaxReplace size="8px" maxlength="10" id="fFuelTankMax" style="text-align : center;">
+	Max fuel tank capacity<input title="The maximum size of the fuel tank (if you don't know what this means then don't change it)" type="text" name="fFuelTankMax" value=fFuelTankMaxReplace size="8px" maxlength="10" id="fFuelTankMax" class= "inputArea">
 	</td></tr>
 	<tr id="dCatering" style="display:none"><td colspan="4" align="center" class="cellS">
 	<input title="Enable buying catering before flying the aircraft (will only buy if you don't have any)" type="checkbox" name="fCatering" fCateringReplace id="fCatering" style="margin-top : 0px;">Catering
 	<select title="Select the type of catering you like to buy" id="lCatering"><option value="7" lCatering7Selected>7- Sky+</option><option value="6" lCatering6Selected>6- Sky Catering</option><option value="5" lCatering5Selected>5- Sky Burgers</option>
 	<option value="4" lCatering4Selected>4- Fast Food</option><option value="3" lCatering3Selected>3- Sky Fish</option><option value="2" lCatering2Selected>2- Cloud Chefs</option><option value="1" lCatering1Selected>1- AM Catering</option></select>
-	Amount<input title="Set the amount of catering to buy (you should follow the min & max values set by the game)" type="text" name="fCAmount" value=fCAmountReplace size="4px" maxlength="5" id="fCAmount" style="text-align : center;">
+	Amount<input title="Set the amount of catering to buy (you should follow the min & max values set by the game)" type="text" name="fCAmount" value=fCAmountReplace size="4px" maxlength="5" id="fCAmount" class= "inputArea">
 	</td></tr>
 	<tr id="dFuel" style="display:none"><td colspan="4" align="center" class="cellS">
 	<input title="Enable buying fuel" type="checkbox" name="fFuel" fFuelReplace id="fFuel" style="margin-top : 0px;">Fuel&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-	If price is or below <input title="The maximum price that you would like to pay for fuel, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price)" type="text" name="fFCost" value=fFCostReplace size="4px" maxlength="4" id="fFCost" style="text-align : center;"><br>
+	If price is or below <input title="The maximum price that you would like to pay for fuel, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price)" type="text" name="fFCost" value=fFCostReplace size="4px" maxlength="4" id="fFCost" class= "inputArea"><br>
 	fill tank<input title="Check this box if you want the script to fill the tank to the maximum when the price is what you want" type="checkbox" name="fFuelFill" fFuelFillReplace id="fFuelFill" style="margin-top : 0px;">
-	or fill up to <input title="The desired amount of fuel that you want to have in your tank" type="text" name="fFAmount" value=fFAmountReplace size="9px" maxlength="10" id="fFAmount" style="text-align : center;"><br>
+	or fill up to <input title="The desired amount of fuel that you want to have in your tank" type="text" name="fFAmount" value=fFAmountReplace size="9px" maxlength="10" id="fFAmount" class= "inputArea"><br>
 	<input title="If the tank is empty then buy enough fuel to fly the aircraft even if it is expensive" type="checkbox" name="fFuelRescue" fFuelRescueReplace id="fFuelRescue" style="margin-top : 0px;">Fuel Rescue
 	<input title="When the fuel price drops to fLuckyFuelPriceReplace or below fill the tank" type="checkbox" name="fFuelLuck" fFuelLuckReplace id="fFuelLuck" style="margin-top : 0px;">Lucky Fuel
 	</td></tr>
 	<tr id="dAds" style="display:none"><td colspan="4" align="center" class="cellS">
 	<table><tr><td>
 	<input title="Enable buying advertisments" type="checkbox" name="fAds" fAdsReplace id="fAds" style="margin-top : 0px;">Ads
-	|  If price is or below <input title="The maximum price that you would like to pay for ads, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price) *Use the prices of the most expensive ad, even if you are buying another type*" type="text" name="fACost" value=fACostReplace size="5px" maxlength="5" id="fACost" style="text-align : center;">
+	|  If price is or below <input title="The maximum price that you would like to pay for ads, if the actual price is higher it will not buy anything (and if the price is lower it will buy with the lower price) *Use the prices of the most expensive ad, even if you are buying another type*" type="text" name="fACost" value=fACostReplace size="5px" maxlength="5" id="fACost" class= "inputArea">
 	<a title="See the price prediction at this link" href="http://fadvisor.net/blog/2010/06/airlinemanager-ads-prices/"> @</a>
 	</td></tr><tr><td>
-	<select title="Select the type of advertising you like to buy" id="lAds">
+	<select title="Select the type of advertising you like to buy" id="lAds"">
 	<option value="1" lAds1Selected>Newspaper advertising</option>
 	<option value="2" lAds2Selected>1 tv commercial</option>
 	<option value="3" lAds3Selected>Internet: In major search engines</option>
@@ -1046,7 +1046,7 @@ function addControls(){
 	* To be implemented *
 	</td></tr>
 	<tr id="dNote" style="display:none"><td colspan="4" class="cellS">
-	<textarea rows="4" style="width: 97%;" id="fNote">fNoteReplace</textarea>
+	<textarea rows="4" class= "inputArea" style="text-align : left; width: 97%;" id="fNote">fNoteReplace</textarea>
 	</td></tr></table>
 	</div>
 	]]></>;
@@ -1144,6 +1144,14 @@ function addControls(){
 	border-top-width:1px; 
 	border-color:#9DAAB8;
 	}
+	
+	.inputArea {
+	border: solid 1px #85b1de; 
+	background-color: #fff;
+	text-align : center;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
 	]]></>;
     
 	var fstyle = document.createElement('style');
