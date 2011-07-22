@@ -15,7 +15,7 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.11
+// @version    1.2.12b
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
 // @ThanksTo    Olla, Luke, [All of you users and commenters]
@@ -778,19 +778,21 @@ function fPoller(){
     window.setTimeout(fPoller, 4000);
 }
 
-function Display(min,sec){    // Format the time as min:sec (mm:ss)
-    var disp;
-    if(min<=9){
-	disp='0'+min+':';
-    } else {
-	disp=min+':';
-    }
+function Display(min,sec){    // Format the time as hr:min:sec (h:mm:ss)
+    var Hours = Math.floor(min/60);
+    var Minutes = min%60;
+    var disp = Hours+':';
+       
+    if(Minutes<=9)
+	disp+='0'+Minutes+':';
+    else 
+	disp+=Minutes+':';
 
-    if(sec<=9){
+    if(sec<=9)
 	disp+='0'+sec;
-    } else{
+    else
 	disp+=sec;
-    }
+
     return(disp);
 }
 
@@ -970,9 +972,9 @@ function addControls(){
 	<table border="0" cellpadding="2" cellspacing="0" class="table1">
 	<caption id="fTitleBar" title="Click on me to move the box" class="title">Airline Manager Autopilot</caption>
 	<tr><td><input title="Start or Stop the script" type="button" id="Autopilot" value="Autopilot"></td>
-	<td style="border-left-style : solid; border-left-width : 1px; border-color:#9DAAB8;"><input title="Time to wait between each run" type="text" name="f_timefreq" value=fTimeReplace size="1px" maxlength="2" id="f_timefreq" class= "inputArea">min +</td>
-	<td colspan=2>Random<input title="A random value (between 0 & what you set) added to the wait time." type="text" name="f_randtime" value=fRTimeReplace size="1px" maxlength="2" id="f_randtime" class= "inputArea" alt="Random Time"></td></tr>
-	<tr><td title="Status of the script (or count down to when it will run next)" id="f_timer" bgcolor="#ff0000" style="text-align : center;">Stopped</td>
+	<td colspan=3 style="border-left-style : solid; border-left-width : 1px; border-color:#9DAAB8;">Wait time <input title="Time to wait between each run" type="text" name="f_timefreq" value=fTimeReplace size="2px" maxlength="3" id="f_timefreq" class= "inputArea">
+	min + Random <input title="A random value (between 0 & what you set) added to the wait time." type="text" name="f_randtime" value=fRTimeReplace size="2px" maxlength="3" id="f_randtime" class= "inputArea" alt="Random Time"></td></tr>
+	<tr><td title="Status of the script (or count down to when it will run next)" id="f_timer" bgcolor="#ff0000" class="timer">Stopped</td>
 	<td style="border-left-style : solid; border-left-width : 1px; border-color:#9DAAB8;"><input title="Enable doing c-check on aircraft before flying them" type="checkbox" name="fCheck" fCheckReplace id="fCheck" style="margin-top : 0px;">C-Check</td>
 	<td><input title="Enable repairing aircraft before flying them" type="checkbox" name="fRepair" fRepairReplace id="fRepair" style="margin-top : 0px;">Repair</td>
 	<td><input title="Enable flying Cargo aircraft (* only if you have them)" type="checkbox" name="fCargo" fCargoReplace id="fCargo" style="margin-top : 0px;">Fly Cargo</td></tr>
@@ -1051,8 +1053,16 @@ function addControls(){
 	</div>
 	]]></>;
 
-	f_html = f_html.toString().replace('[Y-POS]', GM_getValue('fY-POS','100px'));
-	f_html = f_html.toString().replace('[X-POS]', GM_getValue('fX-POS','5px'));
+	var fLeft = GM_getValue('fY-POS','100px');
+	var fTop = GM_getValue('fX-POS','5px');
+	
+	if (fLeft.length < 3 || fTop.length <3 ){   // To reset the values in case they were not stored correctly
+	    fLeft = '100px';
+	    fTop = '5px';
+	}
+
+	f_html = f_html.toString().replace('[Y-POS]', fLeft);
+	f_html = f_html.toString().replace('[X-POS]', fTop);
 	f_html = f_html.toString().replace('fTimeReplace', GM_getValue('fTime',8));
 	f_html = f_html.toString().replace('fRTimeReplace', GM_getValue('fRTime',4));
 	f_html = f_html.toString().replace('fLuckyFuelPriceReplace', GM_getValue('fLuckyFuelPrice',50));
@@ -1082,10 +1092,6 @@ function addControls(){
 	f_html = f_html.toString().replace('lADay' + GM_getValue('lADays',6) + 'Selected', 'selected="yes"');
 	f_html = f_html.toString().replace(/lADay.?Selected/g, '');
 
-	var fdiv = document.createElement('div');
-	fdiv.innerHTML = f_html;
-	fFB.appendChild(fdiv);
-
 	var f_script = <><![CDATA[
 	function showTab(tabName){
 	document.getElementById("dOptions").style.display = "none";
@@ -1100,10 +1106,6 @@ function addControls(){
 	}
 	}
 	]]></>;
-	var fscript = document.createElement('script');
-	fscript.innerHTML = f_script;
-	
-	document.head.appendChild(fscript);
 
 	var f_style = <><![CDATA[
 	#fAMAP {
@@ -1152,11 +1154,25 @@ function addControls(){
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
+	}
+	
+	.timer {
+	font-size:1.3em; 
+	text-align : center;
+	}
 	]]></>;
+    
+	var fscript = document.createElement('script');
+	fscript.innerHTML = f_script;
+	document.head.appendChild(fscript);
     
 	var fstyle = document.createElement('style');
 	fstyle.innerHTML = f_style;
 	document.head.appendChild(fstyle);
+	
+	var fdiv = document.createElement('div');
+	fdiv.innerHTML = f_html;
+	fFB.appendChild(fdiv);
 
 	document.getElementById('fTitleBar').addEventListener('mousedown',moveMe,true);
 	document.getElementById('Autopilot').addEventListener('click',enableAutoPilot,false);
