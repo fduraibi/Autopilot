@@ -15,7 +15,7 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.12b
+// @version    1.2.12d
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
 // @ThanksTo    Olla, Luke, [All of you users and commenters]
@@ -223,7 +223,7 @@ function f_Fly(){
 	    a_List = d2_fly.getElementsByTagName('a');
 	    for (i = 0; i < a_List.length; i++) {
 		att = a_List[i].getAttribute('onclick');
-		if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new\.php/)>-1){
+		if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_newL\.php/)>-1){
 		    location.assign( 'javascript:' + att + ';void(0)' );
 		    GM_log('Fly them..');
 		    fL = true;
@@ -768,7 +768,7 @@ function fPoller(){
 	fDelay = GM_getValue('fDelay',4) * 1000;	    //load the delay value and converts it into milliseconds
 	fRndDelay = GM_getValue('fRndDelay',5) * 1000;
 	fLuckyFuelPrice = GM_getValue('fLuckyFuelPrice',50);
-	fFuelTankMax = GM_getValue('fFuelTankMax',1000000000);
+	fFuelTankMax = GM_getValue('fFuelTankMax',999999999);
 
 	GetFBSession();
 	
@@ -901,7 +901,7 @@ function fSettings(){    // Store the script settings under Firefox
 
     if(document.getElementById('fFuelFill').checked === true){
 	GM_setValue('fFuelFill', 'Checked');
-	document.getElementById('fFAmount').value = GM_getValue('fFuelTankMax',1000000000);
+	document.getElementById('fFAmount').value = GM_getValue('fFuelTankMax',999999999);
 	document.getElementById('fFAmount').disabled = true;
     } else{
 	GM_setValue('fFuelFill', '');
@@ -1066,7 +1066,7 @@ function addControls(){
 	f_html = f_html.toString().replace('fTimeReplace', GM_getValue('fTime',8));
 	f_html = f_html.toString().replace('fRTimeReplace', GM_getValue('fRTime',4));
 	f_html = f_html.toString().replace('fLuckyFuelPriceReplace', GM_getValue('fLuckyFuelPrice',50));
-	f_html = f_html.toString().replace('fFuelTankMaxReplace', GM_getValue('fFuelTankMax',1000000000));
+	f_html = f_html.toString().replace('fFuelTankMaxReplace', GM_getValue('fFuelTankMax',999999999));
 	f_html = f_html.toString().replace('fRepairReplace', GM_getValue('fRepair','Checked'));
 	f_html = f_html.toString().replace('fCheckReplace', GM_getValue('fCheck','Checked'));
 	f_html = f_html.toString().replace('fCargoReplace', GM_getValue('fCargo',''));
