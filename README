@@ -11,6 +11,11 @@ install/add this script to GreaseMonkey, now when you open the AirlineManager ga
 start and the control box will show at the top left of the page.
 
 Change log:
+1.2.12: (July/25/2011)
+    * Allow more wait time (up to 999 minutes + 999 random minutes), using longer time + random makes it hard to get detected ;)
+    * Fix: the contol box might show up in a wierd location and cannot be clicked.
+    * Fix: Update fly link.
+    * Fix: Reset the tank max to 999999999 since AM will not accept 1000000000 even it is the max as they say!
 1.2.11: (July/21/2011)
     * New: Buying advertisement is now possible.
     * Redesign the way tasks are being done to prevent some tasks from starting before other finish.
