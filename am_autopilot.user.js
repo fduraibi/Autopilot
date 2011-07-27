@@ -15,7 +15,7 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.12
+// @version    1.2.13
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
 // @ThanksTo    Olla, Luke, [All of you users and commenters]
@@ -158,7 +158,7 @@ function f_Cargo(){
 	    a_List = d2_fly.getElementsByTagName('a');
 	    for (i = 0; i < a_List.length; i++) {
 		att = a_List[i].getAttribute('onclick');
-		if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_newC\.php/)>-1){
+		if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new.\.php/)>-1){
 		    location.assign( 'javascript:' + att + ';void(0)' );
 		    GM_log('Fly cargo..');
 		    fL = true;
@@ -223,7 +223,7 @@ function f_Fly(){
 	    a_List = d2_fly.getElementsByTagName('a');
 	    for (i = 0; i < a_List.length; i++) {
 		att = a_List[i].getAttribute('onclick');
-		if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_newL\.php/)>-1){
+		if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new.\.php/)>-1){
 		    location.assign( 'javascript:' + att + ';void(0)' );
 		    GM_log('Fly them..');
 		    fL = true;
