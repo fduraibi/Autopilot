@@ -15,7 +15,7 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.13
+// @version    1.2.14
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
 // @ThanksTo    Olla, Luke, [All of you users and commenters]
@@ -151,31 +151,25 @@ function f_Cargo(){
 	fSL=0;
 
 	// Look for the Start Routes button and click it
-	var d2_fly = document.getElementById('flightStarter');
-	if (d2_fly !== null){
-	    var att;
-	    var fL=false;
-	    a_List = d2_fly.getElementsByTagName('a');
-	    for (i = 0; i < a_List.length; i++) {
-		att = a_List[i].getAttribute('onclick');
-		if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new.\.php/)>-1){
-		    location.assign( 'javascript:' + att + ';void(0)' );
-		    GM_log('Fly cargo..');
-		    fL = true;
-		    break;
-		}
-	    }
-	    if (fL === false){
-		GM_log('Could not find the Cargo link...');
-	    }else{
-		//run cargo function again to fly more routes if any
-		GM_log('Do we have more cargo routes to fly?....');
-		window.setTimeout(f_Cargo, fDelay+fRand(fRndDelay));
+	var att;
+	var fL=false;
+	a_List = d_fly.getElementsByTagName('a');
+	for (i = 0; i < a_List.length; i++) {
+	    att = a_List[i].getAttribute('onclick');
+	    if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new.\.php/)>-1){
+		location.assign( 'javascript:' + att + ';void(0)' );
+		GM_log('Fly cargo..');
+		fL = true;
+		break;
 	    }
 	}
-	else{
+	if (fL === false){
 	    GM_log('Cargo-done.. see you later');
 	    GM_setValue('fRun','done');
+	}else{
+	    //run cargo function again to fly more routes if any
+	    GM_log('Do we have more cargo routes to fly?....');
+	    window.setTimeout(f_Cargo, fDelay+fRand(fRndDelay));
 	}
     }
 }
@@ -216,32 +210,26 @@ function f_Fly(){
 	fSL=0;
 
 	// Look for the Start Routes button and click it
-	var d2_fly = document.getElementById('flightStarter');
-	if (d2_fly !== null){
-	    var att;
-	    var fL=false;
-	    a_List = d2_fly.getElementsByTagName('a');
-	    for (i = 0; i < a_List.length; i++) {
-		att = a_List[i].getAttribute('onclick');
-		if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new.\.php/)>-1){
-		    location.assign( 'javascript:' + att + ';void(0)' );
-		    GM_log('Fly them..');
-		    fL = true;
-		    break;
-		}
-	    }
-	    if (fL === false){
-		GM_log('Could not find the Fly  ...');
-	    }else{
-		//run fly function again to fly more routes if any
-		GM_log('Do we have more routes to fly?....');
-		window.setTimeout(f_Fly, fDelay+fRand(fRndDelay));
+	var att;
+	var fL=false;
+	a_List = d_fly.getElementsByTagName('a');
+	for (i = 0; i < a_List.length; i++) {
+	    att = a_List[i].getAttribute('onclick');
+	    if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new.\.php/)>-1){
+		location.assign( 'javascript:' + att + ';void(0)' );
+		GM_log('Fly them..');
+		fL = true;
+		break;
 	    }
 	}
-	else{
+	if (fL === false){
 	    GM_log('Fly-done..');
 	    GM_setValue('fRun','cargo');
 	    fExecutionPipe();
+	}else{
+	    //run fly function again to fly more routes if any
+	    GM_log('Do we have more routes to fly?....');
+	    window.setTimeout(f_Fly, fDelay+fRand(fRndDelay));
 	}
     }
 }
