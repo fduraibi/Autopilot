@@ -15,10 +15,10 @@ var fap_meta = <><![CDATA[
 // @url        http://fadvisor.net/blog/2010/03/auto-pilot/
 // @namespace    autopilot
 // @author    Fahad Alduraibi
-// @version    1.2.14
+// @version    1.2.17
 // @include    http*://apps.facebook.com/airline_manager/*
 // @include    http*://airlinemanager.activewebs.dk/am/*
-// @ThanksTo    Olla, Luke, [All of you users and commenters]
+// @ThanksTo    Olla, Luke, Nano and All of you users and commenters
 // ==/UserScript==
 ]]></>;
 
@@ -151,6 +151,7 @@ function f_Cargo(){
 	fSL=0;
 
 	// Look for the Start Routes button and click it
+	GM_log('Searching for the cargo link..');
 	var att;
 	var fL=false;
 	a_List = d_fly.getElementsByTagName('a');
@@ -158,9 +159,33 @@ function f_Cargo(){
 	    att = a_List[i].getAttribute('onclick');
 	    if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new.\.php/)>-1){
 		location.assign( 'javascript:' + att + ';void(0)' );
-		GM_log('Fly cargo..');
+		GM_log('Fly them..');
 		fL = true;
 		break;
+	    }
+	}
+	if (fL === false){
+	    a_List = d_fly.getElementsByTagName('img');
+	    for (i = 0; i < a_List.length; i++) {
+		att = a_List[i].getAttribute('onclick');
+		if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new.\.php/)>-1){
+		    location.assign( 'javascript:' + att + ';void(0)' );
+		    GM_log('Fly cargo..');
+		    fL = true;
+		    break;
+		}
+	    }
+	}
+	if (fL === false){
+	    a_List = d_fly.getElementsByTagName('input');
+	    for (i = 0; i < a_List.length; i++) {
+		att = a_List[i].getAttribute('onclick');
+		if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new.\.php/)>-1){
+		    location.assign( 'javascript:' + att + ';void(0)' );
+		    GM_log('Fly cargo..');
+		    fL = true;
+		    break;
+		}
 	    }
 	}
 	if (fL === false){
@@ -210,6 +235,7 @@ function f_Fly(){
 	fSL=0;
 
 	// Look for the Start Routes button and click it
+	GM_log('Searching for the fly link..');
 	var att;
 	var fL=false;
 	a_List = d_fly.getElementsByTagName('a');
@@ -220,6 +246,30 @@ function f_Fly(){
 		GM_log('Fly them..');
 		fL = true;
 		break;
+	    }
+	}
+	if (fL === false){
+	    a_List = d_fly.getElementsByTagName('img');
+	    for (i = 0; i < a_List.length; i++) {
+		att = a_List[i].getAttribute('onclick');
+		if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new.\.php/)>-1){
+		    location.assign( 'javascript:' + att + ';void(0)' );
+		    GM_log('Fly them..');
+		    fL = true;
+		    break;
+		}
+	    }
+	}
+	if (fL === false){
+	    a_List = d_fly.getElementsByTagName('input');
+	    for (i = 0; i < a_List.length; i++) {
+		att = a_List[i].getAttribute('onclick');
+		if (att!== null && att.search(/FetchFlightStarter\('ajax_f_all_new.\.php/)>-1){
+		    location.assign( 'javascript:' + att + ';void(0)' );
+		    GM_log('Fly them..');
+		    fL = true;
+		    break;
+		}
 	    }
 	}
 	if (fL === false){
@@ -689,7 +739,7 @@ function fExecutionPipe(){
     fSL=0;
     
     if(GM_getValue('fRun') === 'fuel'){
-	if(GM_getValue('fFuel') === 'Checked'){
+	if(GM_getValue('fFuel','') === 'Checked'){
 	    GM_log('Check Fuel...');
 	    f_Fuel();
 	} else{
@@ -698,7 +748,7 @@ function fExecutionPipe(){
     }
 
     if(GM_getValue('fRun') === 'catering'){
-	if(GM_getValue('fCatering') === 'Checked'){
+	if(GM_getValue('fCatering','') === 'Checked'){
 	    GM_log('Buy Catering...');
 	    f_BuyCatering();
 	} else{
@@ -707,7 +757,7 @@ function fExecutionPipe(){
     }
     
     if(GM_getValue('fRun') === 'ads'){
-	if(GM_getValue('fAds','Checked') === 'Checked'){
+	if(GM_getValue('fAds','') === 'Checked'){
 	    GM_log('Do Ads...');
 	    f_openAds();
 	} else{
@@ -1208,4 +1258,4 @@ window.setTimeout(addControls, fDelay);
 
 - Selling & buying aircraft
 
-*/
+ */
