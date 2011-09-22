@@ -11,6 +11,14 @@ install/add this script to GreaseMonkey, now when you open the AirlineManager ga
 start and the control box will show at the top left of the page.
 
 Change log:
+1.2.17: (Sept/22/2011)
+    * Final offical release.
+    * Script development not continue since the game developer asked me to stop doing it.
+.
+.
+.
+.
+.
 1.2.12: (July/25/2011)
     * Allow more wait time (up to 999 minutes + 999 random minutes), using longer time + random makes it hard to get detected ;)
     * Fix: the contol box might show up in a wierd location and cannot be clicked.
